@@ -179,11 +179,14 @@ See the xref:api:java/org/springframework/boot/builder/SpringApplicationBuilder.
 [[features.spring-application.application-availability]]
 == Application Availability
 
-When deployed on platforms, applications can provide information about their availability to the platform using infrastructure such as https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/[Kubernetes Probes].
-Spring Boot includes out-of-the box support for the commonly used "`liveness`" and "`readiness`" availability states.
-If you are using Spring Boot's "`actuator`" support then these states are exposed as health endpoint groups.
-
-In addition, you can also obtain availability states by injecting the `ApplicationAvailability` interface into your own beans.
+* [Once the application is deployed on platforms] applications -- can provide via infrastructure ( _Example:_ https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/[Kubernetes Probes] ) -- information about their availability to the platform .
+* Spring Boot
+    ** provides
+        *** availability states
+            **** "`liveness`"
+            **** "`readiness`"
+            **** if you inject the `ApplicationAvailability` interface into your own beans -> they can be got
+        *** if you are using Spring Boot's "`actuator`" -> these states -- are exposed as -- health endpoint groups
 
 
 
@@ -218,19 +221,24 @@ TIP: Tasks expected to run during startup should be executed by `CommandLineRunn
 [[features.spring-application.application-availability.managing]]
 === Managing the Application Availability State
 
-Application components can retrieve the current availability state at any time, by injecting the `ApplicationAvailability` interface and calling methods on it.
-More often, applications will want to listen to state updates or update the state of the application.
+* To retrieve the current availability state
+    ** requirements
+        *** inject the `ApplicationAvailability` interface | Application components &
+        *** call `ApplicationAvailability` 's methods
+* To listen the state
+    ** way to do it
+        *** export the "Readiness" state of the application -- to a -- file / Kubernetes "exec Probe" can look at it
 
-For example, we can export the "Readiness" state of the application to a file so that a Kubernetes "exec Probe" can look at this file:
+    include-code::MyReadinessStateExporter[]
 
-include-code::MyReadinessStateExporter[]
+* To update the state of the application if the application breaks
 
-We can also update the state of the application, when the application breaks and cannot recover:
+    include-code::MyLocalCacheVerifier[]
 
-include-code::MyLocalCacheVerifier[]
-
-Spring Boot provides xref:actuator/endpoints.adoc#actuator.endpoints.kubernetes-probes[Kubernetes HTTP probes for "Liveness" and "Readiness" with Actuator Health Endpoints].
-You can get more guidance about xref:how-to:deployment/cloud.adoc#howto.deployment.cloud.kubernetes[deploying Spring Boot applications on Kubernetes in the dedicated section].
+* Spring Boot
+    ** provides
+        *** xref:actuator/endpoints.adoc#actuator.endpoints.kubernetes-probes[Kubernetes HTTP probes for "Liveness" and "Readiness" with Actuator Health Endpoints].
+    ** check xref:how-to:deployment/cloud.adoc#howto.deployment.cloud.kubernetes[deploying Spring Boot applications on Kubernetes in the dedicated section].
 
 
 
