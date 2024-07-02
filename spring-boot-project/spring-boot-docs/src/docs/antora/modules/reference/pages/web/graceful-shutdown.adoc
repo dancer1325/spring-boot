@@ -1,22 +1,33 @@
 [[web.graceful-shutdown]]
 = Graceful Shutdown
 
-Graceful shutdown is supported with all four embedded web servers (Jetty, Reactor Netty, Tomcat, and Undertow) and with both reactive and servlet-based web applications.
-It occurs as part of closing the application context and is performed in the earliest phase of stopping `SmartLifecycle` beans.
-This stop processing uses a timeout which provides a grace period during which existing requests will be allowed to complete but no new requests will be permitted.
+* supported with
+    ** ALL four embedded web servers (Jetty, Reactor Netty, Tomcat, and Undertow) &
+    ** web applications
+        *** reactive &
+        *** servlet-based
+* when is it done?
+    ** part of closing the application context
+    ** earliest phase of stopping `SmartLifecycle` beans
+        *** exist timeout or grace period /
+            **** existing requests will be allowed to complete
+            **** but NOT new requests will be permitted /
+                ***** 👁️ways 👁
+                    ******  allowed
+                        ******* at the network layer
+                            ******** _Example:_ Jetty, Reactor Netty, and Tomcat
+                        ******* return a response / specific HTTP status code or HTTP header
+                            ******** _Example:_ Undertow accepts new connections, BUT respond immediately with 503
+                    ****** depends on
+                        ******* web server / is being used
+                            ******** xref:api:java/org/springframework/boot/web/embedded/tomcat/TomcatWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`TomcatWebServer`]
+                                ********* requirements   Tomcat v9.0.33+=
+                            ******** xref:api:java/org/springframework/boot/web/embedded/netty/NettyWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`NettyWebServer`]
+                            ******** xref:api:java/org/springframework/boot/web/embedded/jetty/JettyWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`JettyWebServer`]
+                            ******** xref:api:java/org/springframework/boot/web/embedded/undertow/UndertowWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`UndertowWebServer`]
+                        ******* use of persistent connections
 
-The exact way in which new requests are not permitted varies depending on the web server that is being used.
-Implementations may stop accepting requests at the network layer, or they may return a response with a specific HTTP status code or HTTP header.
-The use of persistent connections can also change the way that requests stop being accepted.
-
-TIP: To learn about more the specific method used with your web server, see the `shutDownGracefully` API documentation for xref:api:java/org/springframework/boot/web/embedded/tomcat/TomcatWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`TomcatWebServer`], xref:api:java/org/springframework/boot/web/embedded/netty/NettyWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`NettyWebServer`], xref:api:java/org/springframework/boot/web/embedded/jetty/JettyWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`JettyWebServer`] or xref:api:java/org/springframework/boot/web/embedded/undertow/UndertowWebServer.html#shutDownGracefully(org.springframework.boot.web.server.GracefulShutdownCallback)[`UndertowWebServer`].
-
-Jetty, Reactor Netty, and Tomcat will stop accepting new requests at the network layer.
-Undertow will accept new connections but respond immediately with a service unavailable (503) response.
-
-NOTE: Graceful shutdown with Tomcat requires Tomcat 9.0.33 or later.
-
-To enable graceful shutdown, configure the configprop:server.shutdown[] property, as shown in the following example:
+* to enable it
 
 [configprops,yaml]
 ----
@@ -24,7 +35,7 @@ server:
   shutdown: "graceful"
 ----
 
-To configure the timeout period, configure the configprop:spring.lifecycle.timeout-per-shutdown-phase[] property, as shown in the following example:
+* to configure the timeout period
 
 [configprops,yaml]
 ----
@@ -33,5 +44,5 @@ spring:
     timeout-per-shutdown-phase: "20s"
 ----
 
-IMPORTANT: Using graceful shutdown with your IDE may not work properly if it does not send a proper `SIGTERM` signal.
-See the documentation of your IDE for more details.
+* if you use graceful shutdown with your IDE & it does not send a proper `SIGTERM` signal ->  may not work properly
+    ** Check the documentation of your IDE for more details.
