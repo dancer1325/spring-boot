@@ -1,26 +1,36 @@
 [[howto.deployment.cloud]]
 = Deploying to the Cloud
 
-Spring Boot's executable jars are ready-made for most popular cloud PaaS (Platform-as-a-Service) providers.
-These providers tend to require that you "`bring your own container`".
-They manage application processes (not Java applications specifically), so they need an intermediary layer that adapts _your_ application to the _cloud's_ notion of a running process.
+* Most popular cloud PaaS (Platform-as-a-Service) providers
+    ** 👁️are ready for -- Spring Boot's executable jars 👁️
+    ** requirements of these providers
+        *** "`bring your own container`"
+    ** what are they for?
+        *** manage application processes -- not Java applications specifically --
+                **** -> 👁️ needed: 👁️ intermediary layer / _your_ application -- is  adapted to -- _cloud's_ notion of a running process
+    ** "`buildpack`" approach
+        *** allows
+            **** your deployed code -- is wrapped in -- whatever is needed / _start_ your application
+                ***** _Examples of whatever_
+                    ****** JDK + call to `java`
+                    ****** embedded web server
+                    ****** full-fledged application server
+            **** being pluggable
+                ***** ⭐ Ideally: ⭐ few customizations to it as possible
+                    ****** 🧠 Reason1: reduces functionality / NOT under your control. 🧠
+                    ****** 🧠 Reason2: minimizes development environment vs production environments. 🧠
+        *** used by
+            **** Heroku
+            **** Cloud Foundry
 
-Two popular cloud providers, Heroku and Cloud Foundry, employ a "`buildpack`" approach.
-The buildpack wraps your deployed code in whatever is needed to _start_ your application.
-It might be a JDK and a call to `java`, an embedded web server, or a full-fledged application server.
-A buildpack is pluggable, but ideally you should be able to get by with as few customizations to it as possible.
-This reduces the footprint of functionality that is not under your control.
-It minimizes divergence between development and production environments.
-
-Ideally, your application, like a Spring Boot executable jar, has everything that it needs to run packaged within it.
-
-In this section, we look at what it takes to get the xref:tutorial:first-application/index.adoc[application that we developed] in the "`Getting Started`" section up and running in the Cloud.
-
+* Goal
+    ** xref:tutorial:first-application/index.adoc[application that we developed] in the "`Getting Started`"  up and running in the Cloud.
 
 
 [[howto.deployment.cloud.cloud-foundry]]
 == Cloud Foundry
 
+* TODO:
 Cloud Foundry provides default buildpacks that come into play if no other buildpack is specified.
 The Cloud Foundry https://github.com/cloudfoundry/java-buildpack[Java buildpack] has excellent support for Spring applications, including Spring Boot.
 You can deploy stand-alone executable jar applications as well as traditional `.war` packaged applications.
@@ -109,41 +119,47 @@ TIP: The https://github.com/pivotal-cf/java-cfenv/[Java CFEnv] project is a bett
 [[howto.deployment.cloud.kubernetes]]
 == Kubernetes
 
-Spring Boot auto-detects Kubernetes deployment environments by checking the environment for `"*_SERVICE_HOST"` and `"*_SERVICE_PORT"` variables.
-You can override this detection with the configprop:spring.main.cloud-platform[] configuration property.
-
-Spring Boot helps you to xref:reference:features/spring-application.adoc#features.spring-application.application-availability[manage the state of your application] and export it with xref:reference:actuator/endpoints.adoc#actuator.endpoints.kubernetes-probes[HTTP Kubernetes Probes using Actuator].
-
+* Spring Boot
+    ** auto-detects -- checking the environment variables `"*_SERVICE_HOST"` and `"*_SERVICE_PORT"` -- the Kubernetes deployment environments
+        *** if you configure `spring.main.cloud-platform` -> you can override this detection
+    ** can xref:reference:features/spring-application.adoc#features.spring-application.application-availability[manage the state of your application] /
+        *** -- via xref:reference:actuator/endpoints.adoc#actuator.endpoints.kubernetes-probes[HTTP Kubernetes Probes using Actuator] -- can be exported it
 
 
 [[howto.deployment.cloud.kubernetes.container-lifecycle]]
 === Kubernetes Container Lifecycle
 
-When Kubernetes deletes an application instance, the shutdown process involves several subsystems concurrently: shutdown hooks, unregistering the service, removing the instance from the load-balancer...
-Because this shutdown processing happens in parallel (and due to the nature of distributed systems), there is a window during which traffic can be routed to a pod that has also begun its shutdown processing.
+* if Kubernetes deletes an application instance -> the shutdown process involves
+    ** concurrently (== parallel )
+        *** several subsystems
+            **** shutdown hooks
+            **** unregistering the service
+            **** removing the instance from the load-balancer
+            **** ...
+        *** + due to the nature of distributed systems -> there is a window of time / traffic -- can be routed yet to the -- pod being shut down
+            **** sleep execution
+                ***** in a preStop handler -- to avoid -- requests being routed to a pod / has already begun shutting down
+                    ****** Once the pre-stop hook has completed ->
+                        ******* SIGTERM -- is sent to the -- container &
+                        ******* xref:reference:web/graceful-shutdown.adoc[graceful shutdown] begin / any remaining in-flight requests is completed
+                            ******** termination grace period := time / Kubernetes waits to shut down gracefully
+                                ********* by default it's 30 seconds
+                                ********* If the containers are still running after the grace period -> they are sent the SIGKILL signal & forcibly removed
+                                ********* if the pod takes longer than 30 seconds to shut down ( Reason: you have increased configprop:spring.lifecycle.timeout-per-shutdown-phase[] ) -> increase the `podSpec.terminationGracePeriodSeconds`
+                ***** / vary from deployment to deployment
 
-You can configure a sleep execution in a preStop handler to avoid requests being routed to a pod that has already begun shutting down.
-This sleep should be long enough for new requests to stop being routed to the pod and its duration will vary from deployment to deployment.
-The preStop handler can be configured by using the PodSpec in the pod's configuration file as follows:
 
-[source,yaml]
-----
-spec:
-  containers:
-  - name: "example-container"
-    image: "example-image"
-    lifecycle:
-      preStop:
-        exec:
-          command: ["sh", "-c", "sleep 10"]
-----
-
-Once the pre-stop hook has completed, SIGTERM will be sent to the container and xref:reference:web/graceful-shutdown.adoc[graceful shutdown] will begin, allowing any remaining in-flight requests to complete.
-
-NOTE: When Kubernetes sends a SIGTERM signal to the pod, it waits for a specified time called the termination grace period (the default for which is 30 seconds).
-If the containers are still running after the grace period, they are sent the SIGKILL signal and forcibly removed.
-If the pod takes longer than 30 seconds to shut down, which could be because you have increased configprop:spring.lifecycle.timeout-per-shutdown-phase[], make sure to increase the termination grace period by setting the `terminationGracePeriodSeconds` option in the Pod YAML.
-
+        [source,yaml]
+        ----
+        spec:
+          containers:
+          - name: "example-container"
+            image: "example-image"
+            lifecycle:
+              preStop:
+                exec:
+                  command: ["sh", "-c", "sleep 10"]
+        ----
 
 
 [[howto.deployment.cloud.heroku]]
