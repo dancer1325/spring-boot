@@ -70,60 +70,56 @@
     ** Check xref:actuator/endpoints.adoc[Production ready features]
 
 
-
 [[features.external-config.command-line-args]]
 == Accessing Command Line Properties
-
-* TODO:
-
-By default, `SpringApplication` converts any command line option arguments (that is, arguments starting with `--`, such as `--server.port=9000`) to a `property` and adds them to the Spring `Environment`.
-As mentioned previously, command line properties always take precedence over file-based property sources.
-
-If you do not want command line properties to be added to the `Environment`, you can disable them by using `SpringApplication.setAddCommandLineProperties(false)`.
-
+* CL's arguments -- are by `SpringApplication` --
+    ** converted to a `property`
+    ** added them to Spring `Environment`
+        *** if you want to disable this behavior -> `SpringApplication.setAddCommandLineProperties(false)`
 
 
 [[features.external-config.application-json]]
 == JSON Application Properties
 
-Environment variables and system properties often have restrictions that mean some property names cannot be used.
-To help with this, Spring Boot allows you to encode a block of properties into a single JSON structure.
+* == block of properties -- is encoded into -- single JSON structure
+* vs OS environment variables or Java System properties
+    ** NO restrictions in some property names
+* if your application starts ->  any `spring.application.json` or `SPRING_APPLICATION_JSON` properties --
+    ** are --
+        *** parsed -- to the `Environment`
+        *** added -- to the `Environment`
+    ** _Example:_
+        *** `SPRING_APPLICATION_JSON` property -- can be supplied on CL in a UN{asterisk}X shell as -- environment variable
 
-When your application starts, any `spring.application.json` or `SPRING_APPLICATION_JSON` properties will be parsed and added to the `Environment`.
+    [source,shell]
+    ----
+    $ SPRING_APPLICATION_JSON='{"my":{"name":"test"}}' java -jar myapp.jar
+    ----
 
-For example, the `SPRING_APPLICATION_JSON` property can be supplied on the command line in a UN{asterisk}X shell as an environment variable:
+            **** `my.name=test` is added in the Spring `Environment`
+        *** supply the JSON -- as a system property:
 
-[source,shell]
-----
-$ SPRING_APPLICATION_JSON='{"my":{"name":"test"}}' java -jar myapp.jar
-----
+    [source,shell]
+    ----
+    $ java -Dspring.application.json='{"my":{"name":"test"}}' -jar myapp.jar
+    ----
 
-In the preceding example, you end up with `my.name=test` in the Spring `Environment`.
+        *** supply the JSON -- as CL's argument:
 
-The same JSON can also be provided as a system property:
+    [source,shell]
+    ----
+    $ java -jar myapp.jar --spring.application.json='{"my":{"name":"test"}}'
+    ----
 
-[source,shell]
-----
-$ java -Dspring.application.json='{"my":{"name":"test"}}' -jar myapp.jar
-----
-
-Or you could supply the JSON by using a command line argument:
-
-[source,shell]
-----
-$ java -jar myapp.jar --spring.application.json='{"my":{"name":"test"}}'
-----
-
-If you are deploying to a classic Application Server, you could also use a JNDI variable named `java:comp/env/spring.application.json`.
-
-NOTE: Although `null` values from the JSON will be added to the resulting property source, the `PropertySourcesPropertyResolver` treats `null` properties as missing values.
-This means that the JSON cannot override properties from lower order property sources with a `null` value.
-
+* if you are deploying to classic Application Server ->  you could use a JNDI variable / named `java:comp/env/spring.application.json`
+* if JSON / `null` value -> 👁️ properties from lower order property sources are NOT override 👁️
+    ** Reason: 🧠 `null` values from the JSON -- are added to the -- resulting property source, BUT `PropertySourcesPropertyResolver` treats `null` properties == missing values🧠
 
 
 [[features.external-config.files]]
 == External Application Properties
 
+* TODO:
 Spring Boot will automatically find and load `application.properties` and `application.yaml` files from the following locations when your application starts:
 
 . From the classpath
