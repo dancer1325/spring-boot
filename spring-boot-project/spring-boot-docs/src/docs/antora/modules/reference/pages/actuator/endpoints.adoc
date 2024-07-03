@@ -1,158 +1,174 @@
 [[actuator.endpoints]]
 = Endpoints
 
-Actuator endpoints let you monitor and interact with your application.
-Spring Boot includes a number of built-in endpoints and lets you add your own.
-For example, the `health` endpoint provides basic application health information.
+* allows
+    ** about your application
+        *** monitoring
+        *** interacting
+* available
+    ** built-in by Spring Boot
+        *** 👁️if they are available (-- check next bullet point --) -> are auto-configured 👁️
+        *** Check xref:actuator/endpoints.adoc#actuator.endpoints.builtin[here]
+    ** added by you
+* allowed customizations
+    ** xref:actuator/endpoints.adoc#actuator.endpoints.enabling[enable or disable] / individual endpoint
+        *** if the endpoint is disabled -> is removed entirely from the application context
+    ** xref:actuator/endpoints.adoc#actuator.endpoints.exposing[-- expose them ( == make them remotely accessible) over -- HTTP or JMX]
+        *** if it's over HTTP -> endpoint -- is, by default, mapped to -- `/actuator/id`
+            **** _Example:_ `/actuator/health`
+        *** Check xref:api:rest/actuator/index.adoc[API documentation]
+    ** available == enabled + exposed
 
-You can xref:actuator/endpoints.adoc#actuator.endpoints.enabling[enable or disable] each individual endpoint and xref:actuator/endpoints.adoc#actuator.endpoints.exposing[expose them (make them remotely accessible) over HTTP or JMX].
-An endpoint is considered to be available when it is both enabled and exposed.
-The built-in endpoints are auto-configured only when they are available.
-Most applications choose exposure over HTTP, where the ID of the endpoint and a prefix of `/actuator` is mapped to a URL.
-For example, by default, the `health` endpoint is mapped to `/actuator/health`.
-
-TIP: To learn more about the Actuator's endpoints and their request and response formats, see the xref:api:rest/actuator/index.adoc[API documentation].
-
-The following technology-agnostic endpoints are available:
+[[actuator.endpoints.builtin]]
+== Built-in Endpoints
 
 [cols="2,5"]
 |===
 | ID | Description
 
 | `auditevents`
-| Exposes audit events information for the current application.
-  Requires an `AuditEventRepository` bean.
+| - Audit events information in current application
+
+  - Requirements: `AuditEventRepository` bean.
 
 | `beans`
-| Displays a complete list of all the Spring beans in your application.
+| Complete list of all the Spring beans in your application.
 
 | `caches`
-| Exposes available caches.
+| Available caches.
 
 | `conditions`
-| Shows the conditions that were evaluated on configuration and auto-configuration classes and the reasons why they did or did not match.
+| - Conditions / -- were evaluated on -- configuration and auto-configuration classes
+
+  - reasons why they did or did not match
 
 | `configprops`
-| Displays a collated list of all `@ConfigurationProperties`.
-Subject to xref:actuator/endpoints.adoc#actuator.endpoints.sanitization[sanitization].
+| Collated list of all `@ConfigurationProperties` / subject to xref:actuator/endpoints.adoc#actuator.endpoints.sanitization[sanitization]
 
 | `env`
-| Exposes properties from Spring's `ConfigurableEnvironment`.
-Subject to xref:actuator/endpoints.adoc#actuator.endpoints.sanitization[sanitization].
+| Properties from Spring's `ConfigurableEnvironment` / subject to xref:actuator/endpoints.adoc#actuator.endpoints.sanitization[sanitization].
 
 | `flyway`
-| Shows any Flyway database migrations that have been applied.
-  Requires one or more `Flyway` beans.
+| - Flyway database migrations / have been applied.
+
+- Requirements >=1 `Flyway` beans.
 
 | `health`
-| Shows application health information.
+| Application health information.
 
 | `httpexchanges`
-| Displays HTTP exchange information (by default, the last 100 HTTP request-response exchanges).
-  Requires an `HttpExchangeRepository` bean.
+| - HTTP exchange information ( -- by default, last 100 HTTP request-response exchanges --)
+
+  - Requirements: `HttpExchangeRepository` bean
 
 | `info`
-| Displays arbitrary application info.
+| Arbitrary application info.
 
 | `integrationgraph`
-| Shows the Spring Integration graph.
-  Requires a dependency on `spring-integration-core`.
+| - Spring Integration graph
+
+  - Requirements: dependency on `spring-integration-core`.
 
 | `loggers`
-| Shows and modifies the configuration of loggers in the application.
+| Configuration of loggers in the application.
 
 | `liquibase`
-| Shows any Liquibase database migrations that have been applied.
-  Requires one or more `Liquibase` beans.
+| - Liquibase database migrations / have been applied.
+
+  - Requirements >= 1 `Liquibase` beans.
 
 | `metrics`
-| Shows "`metrics`" information for the current application.
+| "`metrics`" information for the current application.
 
 | `mappings`
-| Displays a collated list of all `@RequestMapping` paths.
+| Collated list of all `@RequestMapping` paths.
 
 |`quartz`
-|Shows information about Quartz Scheduler jobs.
-Subject to xref:actuator/endpoints.adoc#actuator.endpoints.sanitization[sanitization].
+| Information about Quartz Scheduler jobs / subject to xref:actuator/endpoints.adoc#actuator.endpoints.sanitization[sanitization].
 
 | `scheduledtasks`
-| Displays the scheduled tasks in your application.
+| Scheduled tasks in your application.
 
 | `sessions`
-| Allows retrieval and deletion of user sessions from a Spring Session-backed session store.
-  Requires a servlet-based web application that uses Spring Session.
+| - Allows retrieval and deletion of user sessions -- from a -- Spring Session-backed session store.
+
+  - Requirements: servlet-based web application / uses Spring Session.
 
 | `shutdown`
-| Lets the application be gracefully shutdown.
-  Only works when using jar packaging.
-  Disabled by default.
+| - gracefully shutdown the application -- by default, it's disabled
+
+  - Requirements: jar packaging is used
+
 
 | `startup`
-| Shows the xref:features/spring-application.adoc#features.spring-application.startup-tracking[startup steps data] collected by the `ApplicationStartup`.
-  Requires the `SpringApplication` to be configured with a `BufferingApplicationStartup`.
+| - xref:features/spring-application.adoc#features.spring-application.startup-tracking[startup steps data] collected by the `ApplicationStartup`
+
+  - Requirements: `SpringApplication` -- must be configured with -- `BufferingApplicationStartup`.
 
 | `threaddump`
 | Performs a thread dump.
 |===
 
-If your application is a web application (Spring MVC, Spring WebFlux, or Jersey), you can use the following additional endpoints:
+* if your application is a web application (Spring MVC, Spring WebFlux, or Jersey), -> you can use also:
 
 [cols="2,5"]
 |===
 | ID | Description
 
 | `heapdump`
-| Returns a heap dump file.
-  On a HotSpot JVM, an `HPROF`-format file is returned.
-  On an OpenJ9 JVM, a `PHD`-format file is returned.
+| - Returns a heap dump file.
+
+  - if a HotSpot JVM -> `HPROF`-format file is returned
+
+  - if OpenJ9 JVM -> `PHD`-format file is returned.
 
 | `logfile`
-| Returns the contents of the logfile (if the `logging.file.name` or the `logging.file.path` property has been set).
-  Supports the use of the HTTP `Range` header to retrieve part of the log file's content.
+| - Returns the contents of the logfile -- via -- HTTP `Range` header
+
+- Requirements: `logging.file.name` or the `logging.file.path` property has been set
+
 
 | `prometheus`
-| Exposes metrics in a format that can be scraped by a Prometheus server.
-  Requires a dependency on `micrometer-registry-prometheus`.
+| - Exposes metrics in a format / can be scraped by a Prometheus server.
+
+  - Requirements: dependency on `micrometer-registry-prometheus`.
 |===
 
 
 
 [[actuator.endpoints.enabling]]
 == Enabling Endpoints
+* 👁️ By default, ALL endpoints except for `shutdown` are enabled. 👁️
+* `management.endpoint.<id>.enabled: booleanToEnable`
 
-By default, all endpoints except for `shutdown` are enabled.
-To configure the enablement of an endpoint, use its `management.endpoint.<id>.enabled` property.
-The following example enables the `shutdown` endpoint:
+    [configprops,yaml]
+    ----
+    management:
+      endpoint:
+        shutdown:
+          enabled: true
+    ----
 
-[configprops,yaml]
-----
-management:
-  endpoint:
-    shutdown:
-      enabled: true
-----
+* `management.endpoints.enabled-by-default`
+    ** if `false` -> endpoint enablement to be opt-in & you need to enable individually / endpoint
+        *** _Example:_
 
-If you prefer endpoint enablement to be opt-in rather than opt-out, set the configprop:management.endpoints.enabled-by-default[] property to `false` and use individual endpoint `enabled` properties to opt back in.
-The following example enables the `info` endpoint and disables all other endpoints:
-
-[configprops,yaml]
-----
-management:
-  endpoints:
-    enabled-by-default: false
-  endpoint:
-    info:
-      enabled: true
-----
-
-NOTE: Disabled endpoints are removed entirely from the application context.
-If you want to change only the technologies over which an endpoint is exposed, use the xref:actuator/endpoints.adoc#actuator.endpoints.exposing[`include` and `exclude` properties] instead.
-
+        [configprops,yaml]
+        ----
+        management:
+          endpoints:
+            enabled-by-default: false
+          endpoint:
+            info:
+              enabled: true
+        ----
 
 
 [[actuator.endpoints.exposing]]
 == Exposing Endpoints
-
+* allows
+    ** choosing the technologies over which an endpoint is exposed
+* TODO:
 By default, only the health endpoint is exposed over HTTP and JMX.
 Since Endpoints may contain sensitive information, you should carefully consider when to expose them.
 
@@ -1317,3 +1333,9 @@ management:
 
 This will add an SBOM called "system", which is stored in `/system.spdx.json`.
 The `optional:` prefix can be used to prevent a startup failure if the file doesn't exist.
+
+
+[[actuator.endpoints.examples]]
+== Example
+
+* Check https://github.com/dancer1325/spring-guides-boot-actuator[thisTutorial]
