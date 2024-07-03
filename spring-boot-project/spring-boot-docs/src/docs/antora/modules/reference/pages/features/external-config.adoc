@@ -1,48 +1,63 @@
 [[features.external-config]]
 = Externalized Configuration
 
-Spring Boot lets you externalize your configuration so that you can work with the same application code in different environments.
-You can use a variety of external configuration sources including Java properties files, YAML files, environment variables, and command-line arguments.
+* == configuration -- can be -- externalized
+* allows
+    ** sample aplication code | different environments
+* external configuration sources
+    ** .properties,
+    ** .yaml,
+    ** environment variables,
+    ** CL arguments
+* Property values
+    ** can be
+        *** -- via `@Value` annotation -- injected directly into your beans
+        *** -- accessed through -- Spring's `Environment` abstraction
+        *** -- via `@ConfigurationProperties` -- xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties[bound to structured objects]
+* 👁️ `PropertySource` order / later property sources -- can override -- values defined earlier 👁️
+    ** `SpringApplication.setDefaultProperties` -- default properties --
+    ** `@PropertySource` annotations | `@Configuration` classes
+        *** {url-spring-framework-javadoc}/org/springframework/context/annotation/PropertySource.html[Check]
+        *** Once the application context has been refreshed (⚠️ & NOT before ⚠️) -> are added to the `Environment`
+            **** -> 👁️ TOO late to configure certain properties 👁️ -- _Example:_  `+logging.*+` and `+spring.main.*+`  --
+    ** config data
+        *** order
+            **** `application.properties` and `application.yaml` / packaged inside your jar
+                ***** xref:features/external-config.adoc#features.external-config.files[Check application properties]
+            **** `application-\{profile}.properties` and `application-\{profile}.yaml` / packaged inside your jar
+                ***** xref:features/external-config.adoc#features.external-config.files.profile-specific[Check profile-specific application properties]
+            **** `application.properties` and `application.yaml` / outside your packaged jar
+                ***** xref:features/external-config.adoc#features.external-config.files[Check application properties]
+            **** `application-\{profile}.properties` and `application-\{profile}.yaml` / outside your packaged jar
+                ***** xref:features/external-config.adoc#features.external-config.files.profile-specific[Check profile-specific application properties]
+            **** if you have both `.properties` and YAML format | same location ->  `.properties` takes precedence
+        *** recommendations
+            **** Choose 1! format (`.properties` OR `.yaml`) | your entire application
+    ** `RandomValuePropertySource` / properties ONLY in `+random.*+`
+    ** OS environment variables
+        *** most operating systems disallow period-separated key names (__Example:__ `spring.config.name`) -> use underscores instead (__Example:__ SPRING_CONFIG_NAME)
+            **** Check xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables[]
+    ** Java System properties -- _Example:_ `System.getProperties()` --
+    ** JNDI attributes from `java:comp/env`
+        *** requirement
+            **** application runs in a servlet container or application server
+    ** `ServletContext` init parameters
+        *** requirement
+            **** application runs in a servlet container or application server
+    ** `ServletConfig` init parameters
+    ** Properties from `SPRING_APPLICATION_JSON`
+        *** == inline JSON / -- embedded in -- environment variable or system property
+    ** CL arguments
+    ** `properties` attribute | tests
+        *** Check
+            **** xref:api:java/org/springframework/boot/test/context/SpringBootTest.html[`@SpringBootTest`]
+            **** xref:testing/spring-boot-applications.adoc#testing.spring-boot-applications.autoconfigured-tests[test annotations for testing a particular slice of your application]
+    ** {url-spring-framework-javadoc}/org/springframework/test/context/DynamicPropertySource.html[`@DynamicPropertySource`] annotations | tests
+    ** {url-spring-framework-javadoc}/org/springframework/test/context/TestPropertySource.html[`@TestPropertySource`] annotations | tests
+    ** if devtools is active -> xref:using/devtools.adoc#using.devtools.globalsettings[Devtools global settings properties] in `$HOME/.config/spring-boot` directory
 
-Property values can be injected directly into your beans by using the `@Value` annotation, accessed through Spring's `Environment` abstraction, or be xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties[bound to structured objects] through `@ConfigurationProperties`.
 
-Spring Boot uses a very particular `PropertySource` order that is designed to allow sensible overriding of values.
-Later property sources can override the values defined in earlier ones.
-Sources are considered in the following order:
-
-. Default properties (specified by setting `SpringApplication.setDefaultProperties`).
-. {url-spring-framework-javadoc}/org/springframework/context/annotation/PropertySource.html[`@PropertySource`] annotations on your `@Configuration` classes.
-  Please note that such property sources are not added to the `Environment` until the application context is being refreshed.
-  This is too late to configure certain properties such as `+logging.*+` and `+spring.main.*+` which are read before refresh begins.
-. Config data (such as `application.properties` files).
-. A `RandomValuePropertySource` that has properties only in `+random.*+`.
-. OS environment variables.
-. Java System properties (`System.getProperties()`).
-. JNDI attributes from `java:comp/env`.
-. `ServletContext` init parameters.
-. `ServletConfig` init parameters.
-. Properties from `SPRING_APPLICATION_JSON` (inline JSON embedded in an environment variable or system property).
-. Command line arguments.
-. `properties` attribute on your tests.
-  Available on xref:api:java/org/springframework/boot/test/context/SpringBootTest.html[`@SpringBootTest`] and the xref:testing/spring-boot-applications.adoc#testing.spring-boot-applications.autoconfigured-tests[test annotations for testing a particular slice of your application].
-. {url-spring-framework-javadoc}/org/springframework/test/context/DynamicPropertySource.html[`@DynamicPropertySource`] annotations in your tests.
-. {url-spring-framework-javadoc}/org/springframework/test/context/TestPropertySource.html[`@TestPropertySource`] annotations on your tests.
-. xref:using/devtools.adoc#using.devtools.globalsettings[Devtools global settings properties] in the `$HOME/.config/spring-boot` directory when devtools is active.
-
-Config data files are considered in the following order:
-
-. xref:features/external-config.adoc#features.external-config.files[Application properties] packaged inside your jar (`application.properties` and YAML variants).
-. xref:features/external-config.adoc#features.external-config.files.profile-specific[Profile-specific application properties] packaged inside your jar (`application-\{profile}.properties` and YAML variants).
-. xref:features/external-config.adoc#features.external-config.files[Application properties] outside of your packaged jar (`application.properties` and YAML variants).
-. xref:features/external-config.adoc#features.external-config.files.profile-specific[Profile-specific application properties] outside of your packaged jar (`application-\{profile}.properties` and YAML variants).
-
-NOTE: It is recommended to stick with one format for your entire application.
-If you have configuration files with both `.properties` and YAML format in the same location, `.properties` takes precedence.
-
-NOTE: If you use environment variables rather than system properties, most operating systems disallow period-separated key names, but you can use underscores instead (for example, configprop:spring.config.name[format=envvar] instead of configprop:spring.config.name[]).
-See xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables[] for details.
-
-NOTE: If your application runs in a servlet container or application server, then JNDI properties (in `java:comp/env`) or servlet context initialization parameters can be used instead of, or as well as, environment variables or system properties.
+* TODO:
 
 To provide a concrete example, suppose you develop a `@Component` that uses a `name` property, as shown in the following example:
 
