@@ -55,26 +55,26 @@
     ** {url-spring-framework-javadoc}/org/springframework/test/context/DynamicPropertySource.html[`@DynamicPropertySource`] annotations | tests
     ** {url-spring-framework-javadoc}/org/springframework/test/context/TestPropertySource.html[`@TestPropertySource`] annotations | tests
     ** if devtools is active -> xref:using/devtools.adoc#using.devtools.globalsettings[Devtools global settings properties] in `$HOME/.config/spring-boot` directory
+* _Example:_
+    ** Let's a `@Component` / uses a `name` property
 
+    include-code::MyBean[]
 
-* TODO:
-
-To provide a concrete example, suppose you develop a `@Component` that uses a `name` property, as shown in the following example:
-
-include-code::MyBean[]
-
-On your application classpath (for example, inside your jar) you can have an `application.properties` file that provides a sensible default property value for `name`.
-When running in a new environment, an `application.properties` file can be provided outside of your jar that overrides the `name`.
-For one-off testing, you can launch with a specific command line switch (for example, `java -jar app.jar --name="Spring"`).
-
-TIP: The `env` and `configprops` endpoints can be useful in determining why a property has a particular value.
-You can use these two endpoints to diagnose unexpected property values.
-See the xref:actuator/endpoints.adoc[Production ready features] section for details.
+        *** it could be overriden with
+            **** application classpath ( -- _Example:_ inside jar) / `application.properties` setting a value for `name`
+            **** if you run a new environment, providing an `application.properties`  outside of your jar
+            **** launch a specific CL (-- _Example:_ `java -jar app.jar --name="Spring"` --)
+* endpoints `/env` and `/configprops`
+    ** allows
+        *** determining the value of a property
+    ** Check xref:actuator/endpoints.adoc[Production ready features]
 
 
 
 [[features.external-config.command-line-args]]
 == Accessing Command Line Properties
+
+* TODO:
 
 By default, `SpringApplication` converts any command line option arguments (that is, arguments starting with `--`, such as `--server.port=9000`) to a `property` and adds them to the Spring `Environment`.
 As mentioned previously, command line properties always take precedence over file-based property sources.
