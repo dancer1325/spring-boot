@@ -212,35 +212,31 @@
         *** NOT mind if it does NOT always exist
             **** _Example:_ if `spring.config.import=optional:file:./myconfig.properties` & `myconfig.properties` file is missing -> your application can start
 
-
 [[features.external-config.files.wildcard-locations]]
 === Wildcard Locations
 
-* TODO:
-
-If a config file location includes the `{asterisk}` character for the last path segment, it is considered a wildcard location.
-Wildcards are expanded when the config is loaded so that immediate subdirectories are also checked.
-Wildcard locations are particularly useful in an environment such as Kubernetes when there are multiple sources of config properties.
-
-For example, if you have some Redis configuration and some MySQL configuration, you might want to keep those two pieces of configuration separate, while requiring that both those are present in an `application.properties` file.
-This might result in two separate `application.properties` files mounted at different locations such as `/config/redis/application.properties` and `/config/mysql/application.properties`.
-In such a case, having a wildcard location of `config/*/`, will result in both files being processed.
-
-By default, Spring Boot includes `config/*/` in the default search locations.
-It means that all subdirectories of the `/config` directory outside of your jar will be searched.
-
-You can use wildcard locations yourself with the `spring.config.location` and `spring.config.additional-location` properties.
-
-NOTE: A wildcard location must contain only one `{asterisk}` and end with `{asterisk}/` for search locations that are directories or `*/<filename>` for search locations that are files.
-Locations with wildcards are sorted alphabetically based on the absolute path of the file names.
-
-TIP: Wildcard locations only work with external directories.
-You cannot use a wildcard in a `classpath:` location.
-
+* := config file location / `{asterisk}` character for the last path segment
+    ** when the config is loaded -> wildcards are expanded  -> immediate subdirectories are also checked
+    ** 1! must be added
+        *** `{asterisk}/` -- search locations / are directories
+        *** `*/<filename>` -- search locations / are files
+    ** are sorted alphabetically -- based on the -- absolute path of the file names
+    ** 👁️ only work with external directories 👁️
+        *** == NOT valid in a `classpath:` location
+* uses
+    ** environments / there are multiple sources of config properties -- _Example:_ Kubernetes --
+        *** _Example:_ let's Redis configuration and MySQL configuration & you want to keep two pieces of configuration separate & both those are present in an `application.properties` file ->
+            **** might result in `/config/redis/application.properties` + `/config/mysql/application.properties`
+            **** with `config/*/` -> both files are processed
+    ** with `spring.config.location` and `spring.config.additional-location` properties
+* `config/*/` included by default by Spring Boot
+    ** == ALL subdirectories of the `/config` outside of your jar -- will be -- searched
 
 
 [[features.external-config.files.profile-specific]]
 === Profile Specific Files
+
+* TODO:
 
 As well as `application` property files, Spring Boot will also attempt to load profile-specific files using the naming convention `application-\{profile}`.
 For example, if your application activates a profile named `prod` and uses YAML files, then both `application.yaml` and `application-prod.yaml` will be considered.
