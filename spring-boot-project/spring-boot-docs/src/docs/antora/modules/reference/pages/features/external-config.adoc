@@ -341,127 +341,116 @@
 [[features.external-config.files.importing-extensionless]]
 === Importing Extensionless Files
 
-* TODO:
+* uses
+    ** some cloud platforms / can NOT add a file extension to volume mounted files
+* how to address it?
+    ** put an extension hint in square brackets
+        *** _Example:_ Let's `/etc/config/myconfig` file / you wish to import as yaml
 
-
-
-
-Some cloud platforms cannot add a file extension to volume mounted files.
-To import these extensionless files, you need to give Spring Boot a hint so that it knows how to load them.
-You can do this by putting an extension hint in square brackets.
-
-For example, suppose you have a `/etc/config/myconfig` file that you wish to import as yaml.
-You can import it from your `application.properties` using the following:
-
-[configprops,yaml]
-----
-spring:
-  config:
-    import: "file:/etc/config/myconfig[.yaml]"
-----
-
-
+            [configprops,yaml]
+            ----
+            spring:
+              config:
+                import: "file:/etc/config/myconfig[.yaml]"
+            ----
 
 [[features.external-config.files.configtree]]
 === Using Configuration Trees
 
-When running applications on a cloud platform (such as Kubernetes) you often need to read config values that the platform supplies.
-It is not uncommon to use environment variables for such purposes, but this can have drawbacks, especially if the value is supposed to be kept secret.
+* options to provide configurations | many cloud platforms
+    ** environment variables
+        *** NOT recommended for secrets
+    ** mounted data volumes
+        *** common volume mount patterns
+            **** 1! file / contains a complete set of properties
+                ***** -- can be got via –– `spring.config.import` Check xref:features/external-config.adoc#features.external-config.files.importing[above]
+            **** 👁 >1 files / written to a directory tree 👁
+                ***** with
+                    ****** filename and foldername -- '`key`'
+                    ****** contents -- '`value`'
+                ***** -- can be got via –– `configtree:`
+        *** _Example:_ In Kubernetes, https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod[`Secrets`] and https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap[`ConfigMaps`]
 
-As an alternative to environment variables, many cloud platforms now allow you to map configuration into mounted data volumes.
-For example, Kubernetes can volume mount both https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap[`ConfigMaps`] and https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod[`Secrets`].
+* `configtree`
+    ** := prefix to specify configuration trees /
+        *** -- can be accessed from -- `Environment` as usual way
+        *** values -- can be bound to -- `String` and `byte[]` types
+    ** _Example:_    Let's imagine, Kubernetes has mounted the following volume
 
-There are two common volume mount patterns that can be used:
+    [source]
+    ----
+    etc/
+      config/
+        myapp.username  # it's a file
+        myapp/
+          username  # content could be a config value
+          password  # content could be a secret
+    ----
 
-. A single file contains a complete set of properties (usually written as YAML).
-. Multiple files are written to a directory tree, with the filename becoming the '`key`' and the contents becoming the '`value`'.
+        **** add the following to your `application.properties` or `application.yaml`
 
-For the first case, you can import the YAML or Properties file directly using `spring.config.import` as described xref:features/external-config.adoc#features.external-config.files.importing[above].
-For the second case, you need to use the `configtree:` prefix so that Spring Boot knows it needs to expose all the files as properties.
+        [configprops,yaml]
+        ----
+        spring:
+          config:
+            import: "optional:configtree:/etc/config/"
+        ----
 
-As an example, let's imagine that Kubernetes has mounted the following volume:
+        **** `spring.config.import=optional:configtree:/etc/config/myapp` -- allows accessing to -- properties as
+            ***** `username`
+            ***** `password`
+        **** Filenames / contain '.' -> correctly mapped
+            ***** _Example:_ 'myapp.username' -- would result in -- `myapp.username` property in the `Environment`
+    ** if you have >1 config trees / same parent folder -> use `configtree:../*/`
+        *** Reason: 🧠 ALL immediate children -- are imported as -- config trees 🧠
+        *** If you do NOT use `/*/` -- based on folderName and fileName -> try to form properties
+        *** _Example:_ let's have
 
-[source]
-----
-etc/
-  config/
-    myapp/
-      username
-      password
-----
+            [source]
+            ----
+            etc/
+              config/
+                dbconfig/
+                  db/
+                    username
+                    password
+                mqconfig/
+                  mq/
+                    username
+                    password
+            ----
 
-The contents of the `username` file would be a config value, and the contents of `password` would be a secret.
+            **** use `configtree:/etc/config/*/`
 
-To import these properties, you can add the following to your `application.properties` or `application.yaml` file:
+            [configprops,yaml]
+            ----
+            spring:
+              config:
+                import: "optional:configtree:/etc/config/*/"
+            ----
 
-[configprops,yaml]
-----
-spring:
-  config:
-    import: "optional:configtree:/etc/config/"
-----
+            **** it adds the properties / names `db.username`, `db.password`, `mq.username` and `mq.password`
+        *** 👁directories are sorted alphabetically 👁
+            **** xref:features/external-config.adoc#features.external-config.files.importing[Check here]
+            **** if you need a different order -> each location -- must be listed as -- separate import
+    ** uses
+        *** >1 files / written to a directory tree | cloud platform
+        *** Docker secrets
+            **** if a Docker swarm service / -- is granted access to -- a secret -> secret gets mounted into the container
+                ***** _Example:_ secret named `db.password` / mounted at location `/run/secrets/` -> you can make it available to the Spring environment via
 
-You can then access or inject `myapp.username` and `myapp.password` properties from the `Environment` in the usual way.
-
-TIP: The names of the folders and files under the config tree form the property name.
-In the above example, to access the properties as `username` and `password`, you can set `spring.config.import` to `optional:configtree:/etc/config/myapp`.
-
-NOTE: Filenames with dot notation are also correctly mapped.
-For example, in the above example, a file named `myapp.username` in `/etc/config` would result in a `myapp.username` property in the `Environment`.
-
-TIP: Configuration tree values can be bound to both string `String` and `byte[]` types depending on the contents expected.
-
-If you have multiple config trees to import from the same parent folder you can use a wildcard shortcut.
-Any `configtree:` location that ends with `/*/` will import all immediate children as config trees.
-As with a non-wildcard import, the names of the folders and files under each config tree form the property name.
-
-For example, given the following volume:
-
-[source]
-----
-etc/
-  config/
-    dbconfig/
-      db/
-        username
-        password
-    mqconfig/
-      mq/
-        username
-        password
-----
-
-You can use `configtree:/etc/config/*/` as the import location:
-
-[configprops,yaml]
-----
-spring:
-  config:
-    import: "optional:configtree:/etc/config/*/"
-----
-
-This will add `db.username`, `db.password`, `mq.username` and `mq.password` properties.
-
-NOTE: Directories loaded using a wildcard are sorted alphabetically.
-If you need a different order, then you should list each location as a separate import
-
-
-Configuration trees can also be used for Docker secrets.
-When a Docker swarm service is granted access to a secret, the secret gets mounted into the container.
-For example, if a secret named `db.password` is mounted at location `/run/secrets/`, you can make `db.password` available to the Spring environment using the following:
-
-[configprops,yaml]
-----
-spring:
-  config:
-    import: "optional:configtree:/run/secrets/"
-----
-
+                [configprops,yaml]
+                ----
+                spring:
+                  config:
+                    import: "optional:configtree:/run/secrets/"
+                ----
 
 
 [[features.external-config.files.property-placeholders]]
 === Property Placeholders
 
+* TODO:
 The values in `application.properties` and `application.yaml` are filtered through the existing `Environment` when they are used, so you can refer back to previously defined values (for example, from System properties or environment variables).
 The standard `$\{name}` property-placeholder syntax can be used anywhere within a value.
 Property placeholders can also specify a default value using a `:` to separate the default value from the property name, for example `${name:default}`.
