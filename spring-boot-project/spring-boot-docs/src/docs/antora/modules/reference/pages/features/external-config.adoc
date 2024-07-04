@@ -119,56 +119,53 @@
 [[features.external-config.files]]
 == External Application Properties
 
-* TODO:
-Spring Boot will automatically find and load `application.properties` and `application.yaml` files from the following locations when your application starts:
+*  When your application starts -> Spring Boot automatically finds and loads  `application.properties` and `application.yaml` files
+    ** from the 👁️following locations / lower items in the next list override earlier ones👁️
+        *** From the classpath
+            **** classpath root
+            **** classpath `/config` package
+        *** From the current directory
+            **** current directory
+            **** current directory's `config/` subdirectory
+            **** `config/` subdirectory's immediate child directories
+    ** are added as `PropertySources` to the Spring `Environment`
+    ** if you do not like `application` as the configuration file name -> you can switch via `spring.config.name=anotherFileName`
+        *** _Example:_ look for `myproject.properties` and `myproject.yaml` files
 
-. From the classpath
-.. The classpath root
-.. The classpath `/config` package
-. From the current directory
-.. The current directory
-.. The `config/` subdirectory in the current directory
-.. Immediate child directories of the `config/` subdirectory
+        [source,shell]
+        ----
+        $ java -jar myproject.jar --spring.config.name=myproject
+        ----
 
-The list is ordered by precedence (with values from lower items overriding earlier ones).
-Documents from the loaded files are added as `PropertySources` to the Spring `Environment`.
+    ** if you want to refer to another location -> specify `spring.config.location=anotherLocation1,anotherLocation2,...`
+        *** if the xref:features/external-config.adoc#features.external-config.files.optional-prefix[locations are optional] & you do NOT mind if they do NOT exist -> Use the prefix `optional:`
+        *** if it contains directories -> should end in `/`
+        *** at runtime, before being loaded, these -- will be appended with -- names generated from `spring.config.name`
+        *** 👁️ later items added can override the values of earlier ones 👁️
+            **** Reason: 🧠 Locations are processed in the order that they are added 🧠
+        *** files specified here are imported directly
+        *** _Example:_
 
-If you do not like `application` as the configuration file name, you can switch to another file name by specifying a configprop:spring.config.name[] environment property.
-For example, to look for `myproject.properties` and `myproject.yaml` files you can run your application as follows:
+        [source,shell]
+        ----
+        $ java -jar myproject.jar --spring.config.location=\
+            optional:classpath:/default.properties,\
+            optional:classpath:/override.properties
+        ----
 
-[source,shell]
-----
-$ java -jar myproject.jar --spring.config.name=myproject
-----
+        *** 👁️(Both directory and file location) expanded to check for xref:features/external-config.adoc#features.external-config.files.profile-specific[profile-specific files] 👁️
+            **** _Example:_ if you have a `spring.config.location=classpath:myconfig.properties` ->  `classpath:myconfig-<profile>.properties` files are loaded
+* `spring.config.name`, `spring.config.location`, and `spring.config.additional-location` must be 👁️ defined as an environment property (-- __Example:__ OS environment variable, system property, or CL argument --) 👁️
+    ** Reason: 🧠 are used very early -- to determine -- which files have to be loaded 🧠
 
-You can also refer to an explicit location by using the configprop:spring.config.location[] environment property.
-This property accepts a comma-separated list of one or more locations to check.
 
-The following example shows how to specify two distinct files:
 
-[source,shell]
-----
-$ java -jar myproject.jar --spring.config.location=\
-	optional:classpath:/default.properties,\
-	optional:classpath:/override.properties
-----
 
-TIP: Use the prefix `optional:` if the xref:features/external-config.adoc#features.external-config.files.optional-prefix[locations are optional] and you do not mind if they do not exist.
-
-WARNING: `spring.config.name`, `spring.config.location`, and `spring.config.additional-location` are used very early to determine which files have to be loaded.
-They must be defined as an environment property (typically an OS environment variable, a system property, or a command-line argument).
-
-If `spring.config.location` contains directories (as opposed to files), they should end in `/`.
-At runtime they will be appended with the names generated from `spring.config.name` before being loaded.
-Files specified in `spring.config.location` are imported directly.
-
-NOTE: Both directory and file location values are also expanded to check for xref:features/external-config.adoc#features.external-config.files.profile-specific[profile-specific files].
-For example, if you have a `spring.config.location` of `classpath:myconfig.properties`, you will also find appropriate `classpath:myconfig-<profile>.properties` files are loaded.
-
-In most situations, each configprop:spring.config.location[] item you add will reference a single file or directory.
-Locations are processed in the order that they are defined and later ones can override the values of earlier ones.
 
 [[features.external-config.files.location-groups]]
+
+* TODO:
+
 If you have a complex location setup, and you use profile-specific configuration files, you may need to provide further hints so that Spring Boot knows how they should be grouped.
 A location group is a collection of locations that are all considered at the same level.
 For example, you might want to group all classpath locations, then all external locations.
