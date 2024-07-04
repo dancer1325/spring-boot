@@ -237,7 +237,7 @@
 === Profile Specific Files
 
 * `spring.profiles.active=profile1,profile2,...`
-    ** 👁️ if NO profiles are explicitly activated -> `application-default` is considered 👁️
+    ** 👁️if NO profiles are explicitly activated -> `application-default` is considered 👁️
         *** := profile / contained by the `Environment`
 * `application-\{profile}`
     ** naming convention
@@ -275,70 +275,76 @@
 [[features.external-config.files.importing]]
 === Importing Additional Data
 
-* TODO:
-Application properties may import further config data from other locations using the `spring.config.import` property.
-Imports are processed as they are discovered, and are treated as additional documents inserted immediately below the one that declares the import.
+* `spring.config.import=import1,import2,...`
+* allows
+    ** importing further config data
+        *** in application properties
+        *** from other locations
+* characteristics
+    ** as soon as they are discovered -> they are processed
+        *** later imports take precedence -- _Example:_ import2 in the previous example takes precedence to import1 --
+    ** -- are treated as -- 👁️additional documents / inserted immediately below the `...import` is declared 👁️
+    ** ⚠️ although you declare to import several times -> it will be imported 1!  ⚠️
+    ** 👁 order that an import is defined within the properties/yaml file does NOT matter 👁
+        *** _Example:_ next '.properties' produce the same result
 
-For example, you might have the following in your classpath `application.properties` file:
+            [configprops%novalidate,yaml]
+            ----
+            spring:
+              config:
+                import: "my.properties" # Imported values here take precedence over the configured in this file, independently the order here
+            my:
+              property: "value"
+            ----
 
-[configprops,yaml]
-----
-spring:
-  application:
-    name: "myapp"
-  config:
-    import: "optional:file:./dev.properties"
-----
+            [configprops%novalidate,yaml]
+            ----
+            my:
+              property: "value"
+            spring:
+              config:
+                import: "my.properties" #  any `my-<profile>.properties` variants are imported
+            ----
 
-This will trigger the import of a `dev.properties` file in current directory (if such a file exists).
-Values from the imported `dev.properties` will take precedence over the file that triggered the import.
-In the above example, the `dev.properties` could redefine `spring.application.name` to a different value.
+    ** 👁importedFile's values -- take precedence over -- fileWhichTriggersTheImport's values 👁
+        *** _Example:_ Check the previous example
+    ** 👁 xref:features/external-config.adoc#features.external-config.files.profile-specific[Profile-specific variants] are also considered for import 👁
+        *** _Example:_ Check the previous example
+    ** can be imported
+        *** by default
+            **** Java properties
+                ***** '.properties'
+                ***** '.yaml'
+            **** xref:features/external-config.adoc#features.external-config.files.configtree[configuration trees]
+        *** from different locations
+            **** local
+            **** one's / provided by pluggable API
+                ***** _Example:_ external stores -- Consul, Apache ZooKeeper or Netflix Archaius --
+            **** customizable
+                ***** Check `ConfigDataLocationResolver` and `ConfigDataLoader` classes | `org.springframework.boot.context.config` package
+* _Example:_
+    ** Let's have in your classpath `application.properties` file
 
-An import will only be imported once no matter how many times it is declared.
-The order an import is defined inside a single document within the properties/yaml file does not matter.
-For instance, the two examples below produce the same result:
+    [configprops,yaml]
+    ----
+    spring:
+      application:
+        name: "myapp"
+      config:
+        import: "optional:file:./dev.properties"
+    ----
 
-[configprops%novalidate,yaml]
-----
-spring:
-  config:
-    import: "my.properties"
-my:
-  property: "value"
-----
-
-[configprops%novalidate,yaml]
-----
-my:
-  property: "value"
-spring:
-  config:
-    import: "my.properties"
-----
-
-In both of the above examples, the values from the `my.properties` file will take precedence over the file that triggered its import.
-
-Several locations can be specified under a single `spring.config.import` key.
-Locations will be processed in the order that they are defined, with later imports taking precedence.
-
-NOTE: When appropriate, xref:features/external-config.adoc#features.external-config.files.profile-specific[Profile-specific variants] are also considered for import.
-The example above would import both `my.properties` as well as any `my-<profile>.properties` variants.
-
-[TIP]
-====
-Spring Boot includes pluggable API that allows various different location addresses to be supported.
-By default you can import Java Properties, YAML and xref:features/external-config.adoc#features.external-config.files.configtree[configuration trees].
-
-Third-party jars can offer support for additional technologies (there is no requirement for files to be local).
-For example, you can imagine config data being from external stores such as Consul, Apache ZooKeeper or Netflix Archaius.
-
-If you want to support your own locations, see the `ConfigDataLocationResolver` and `ConfigDataLoader` classes in the `org.springframework.boot.context.config` package.
-====
-
-
+        *** `dev.properties` file in current directory (if such a file exists)
+            **** is imported
+            **** `dev.properties` 's values take precedence over the file that triggered the import (== `application.properties` in this case)
 
 [[features.external-config.files.importing-extensionless]]
 === Importing Extensionless Files
+
+* TODO:
+
+
+
 
 Some cloud platforms cannot add a file extension to volume mounted files.
 To import these extensionless files, you need to give Spring Boot a hint so that it knows how to load them.
