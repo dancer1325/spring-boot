@@ -194,21 +194,29 @@
 [[features.external-config.files.optional-prefix]]
 === Optional Locations
 
-* TODO:
-By default, when a specified config data location does not exist, Spring Boot will throw a `ConfigDataLocationNotFoundException` and your application will not start.
-
-If you want to specify a location, but you do not mind if it does not always exist, you can use the `optional:` prefix.
-You can use this prefix with the `spring.config.location` and `spring.config.additional-location` properties, as well as with xref:features/external-config.adoc#features.external-config.files.importing[`spring.config.import`] declarations.
-
-For example, a `spring.config.import` value of `optional:file:./myconfig.properties` allows your application to start, even if the `myconfig.properties` file is missing.
-
-If you want to ignore all `ConfigDataLocationNotFoundExceptions` and always continue to start your application, you can use the `spring.config.on-not-found` property.
-Set the value to `ignore` using `SpringApplication.setDefaultProperties(...)` or with a system/environment variable.
-
+* if a specified config data location does NOT exist
+    ** ->
+        *** Spring Boot will throw a `ConfigDataLocationNotFoundException` &
+        *** your application will NOT start
+    ** 👁️solution to skip it `spring.config.on-not-found=ignore` 👁️
+        *** you can specify it via
+            **** `SpringApplication.setDefaultProperties(...)` or
+            **** system/environment variable
+* `optional:locationToSpecify`
+    ** := prefix
+    ** uses
+        *** for the environment variables
+            **** `spring.config.location`
+            **** `spring.config.additional-location`
+            **** xref:features/external-config.adoc#features.external-config.files.importing[`spring.config.import`]
+        *** NOT mind if it does NOT always exist
+            **** _Example:_ if `spring.config.import=optional:file:./myconfig.properties` & `myconfig.properties` file is missing -> your application can start
 
 
 [[features.external-config.files.wildcard-locations]]
 === Wildcard Locations
+
+* TODO:
 
 If a config file location includes the `{asterisk}` character for the last path segment, it is considered a wildcard location.
 Wildcards are expanded when the config is loaded so that immediate subdirectories are also checked.
