@@ -138,6 +138,14 @@
         ----
 
     ** if you want to refer to another location -> specify `spring.config.location=anotherLocation1,anotherLocation2,...`
+        *** ⚠️ if you configure it -> replace the default locations ⚠️
+            **** _Example:_ if `spring.config.location=optional:classpath:/custom-config/,optional:file:./custom-config/` -> the complete set of locations is
+
+
+                optional:classpath:custom-config/
+                optional:file:./custom-config/
+
+
         *** if the xref:features/external-config.adoc#features.external-config.files.optional-prefix[locations are optional] & you do NOT mind if they do NOT exist -> Use the prefix `optional:`
         *** if it contains directories -> should end in `/`
         *** at runtime, before being loaded, these -- will be appended with -- names generated from `spring.config.name`
@@ -155,47 +163,38 @@
 
         *** 👁️(Both directory and file location) expanded to check for xref:features/external-config.adoc#features.external-config.files.profile-specific[profile-specific files] 👁️
             **** _Example:_ if you have a `spring.config.location=classpath:myconfig.properties` ->  `classpath:myconfig-<profile>.properties` files are loaded
-* `spring.config.name`, `spring.config.location`, and `spring.config.additional-location` must be 👁️ defined as an environment property (-- __Example:__ OS environment variable, system property, or CL argument --) 👁️
-    ** Reason: 🧠 are used very early -- to determine -- which files have to be loaded 🧠
+    ** if you want to add additional locations, rather than replacing them, ->  `spring.config.additional-location`
+        *** override those in the default locations
+        *** _Example:_ if `spring.config.additional-location=optional:classpath:/custom-config/,optional:file:./custom-config/` -> the complete set of locations is
 
+            optional:classpath:/;optional:classpath:/config/
+            optional:file:./;optional:file:./config/;optional:file:./config/*/
+            optional:classpath:custom-config/
+            optional:file:./custom-config/
 
-
-
+* `spring.config.name`, `spring.config.location`, and `spring.config.additional-location`
+    ** must be 👁️ defined as an environment property (-- __Example:__ OS environment variable, system property, or CL argument --) 👁️
+        *** Reason: 🧠 are used very early -- to determine -- which files have to be loaded 🧠
+    ** allows
+        *** values in `application.properties` OR others / indicated in `spring.config.name` | default locations -- can be overridden 👁️ at runtime 👁️ with -> different file | custom locations
+        *** selectively overriding values / placed in another files
 
 [[features.external-config.files.location-groups]]
+=== Location Groups
 
-* TODO:
-
-If you have a complex location setup, and you use profile-specific configuration files, you may need to provide further hints so that Spring Boot knows how they should be grouped.
-A location group is a collection of locations that are all considered at the same level.
-For example, you might want to group all classpath locations, then all external locations.
-Items within a location group should be separated with `;`.
-See the example in the xref:features/external-config.adoc#features.external-config.files.profile-specific[] section for more details.
-
-Locations configured by using `spring.config.location` replace the default locations.
-For example, if `spring.config.location` is configured with the value `optional:classpath:/custom-config/,optional:file:./custom-config/`, the complete set of locations considered is:
-
-. `optional:classpath:custom-config/`
-. `optional:file:./custom-config/`
-
-If you prefer to add additional locations, rather than replacing them, you can use `spring.config.additional-location`.
-Properties loaded from additional locations can override those in the default locations.
-For example, if `spring.config.additional-location` is configured with the value `optional:classpath:/custom-config/,optional:file:./custom-config/`, the complete set of locations considered is:
-
-. `optional:classpath:/;optional:classpath:/config/`
-. `optional:file:./;optional:file:./config/;optional:file:./config/*/`
-. `optional:classpath:custom-config/`
-. `optional:file:./custom-config/`
-
-This search ordering lets you specify default values in one configuration file and then selectively override those values in another.
-You can provide default values for your application in `application.properties` (or whatever other basename you choose with `spring.config.name`) in one of the default locations.
-These default values can then be overridden at runtime with a different file located in one of the custom locations.
-
+* := collection of locations / are all considered at the same level
+    ** `;` is the delimiter of items in the same group -- `locationGroupItem1;locationGroupItem2;locationGroupItem3...` --
+* allows
+    ** providing further hints so that Spring Boot knows how they should be grouped
+* uses
+    ** you use complex location setup, and profile-specific configuration files
+* _Example:_ Check in xref:features/external-config.adoc#features.external-config.files.profile-specific[]
 
 
 [[features.external-config.files.optional-prefix]]
 === Optional Locations
 
+* TODO:
 By default, when a specified config data location does not exist, Spring Boot will throw a `ConfigDataLocationNotFoundException` and your application will not start.
 
 If you want to specify a location, but you do not mind if it does not always exist, you can use the `optional:` prefix.
