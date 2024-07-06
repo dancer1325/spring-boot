@@ -33,11 +33,17 @@ public class MyEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		Resource path = new ClassPathResource("com/example/myapp/config.yml");
+		Resource path = new ClassPathResource("com/example/myapp/config.yml");	// TODO: Where is this file defined?
 		PropertySource<?> propertySource = loadYaml(path);
+		// Spring Boot loads -- usual property sources in the -- Environment
 		environment.getPropertySources().addLast(propertySource);
 	}
 
+	/**
+	 * Adds the `custom-resource` property source at the end of the list -> others take precedence
+	 * @param path
+	 * @return
+	 */
 	private PropertySource<?> loadYaml(Resource path) {
 		Assert.isTrue(path.exists(), () -> "Resource " + path + " does not exist");
 		try {
