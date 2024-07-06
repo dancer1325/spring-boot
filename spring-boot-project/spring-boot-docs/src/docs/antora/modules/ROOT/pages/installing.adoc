@@ -69,31 +69,27 @@ More details on getting started with Spring Boot and Gradle can be found in the 
 [[getting-started.installing.cli]]
 == Installing the Spring Boot CLI
 
-The Spring Boot CLI (Command Line Interface) is a command line tool that you can use to quickly prototype with Spring.
-
-You do not need to use the CLI to work with Spring Boot, but it is a quick way to get a Spring application off the ground without an IDE.
-
+* Spring Boot CLI
+    ** := CL tool /
+        *** quickly prototype with Spring
+    ** unnecessary to work with Spring Boot
+    ** recommended to get Spring application off the ground without an IDE
 
 
 [[getting-started.installing.cli.manual-installation]]
 === Manual Installation
 
-ifeval::["{artifact-release-type}" == "snapshot"]
-You can download one of the `spring-boot-cli-\*-bin.zip` or `spring-boot-cli-*-bin.tar.gz` files from the {url-artifact-repository}/org/springframework/boot/spring-boot-cli/{version-spring-boot}/[Spring software repository].
-endif::[]
-ifeval::["{artifact-release-type}" != "snapshot"]
-You can download the Spring CLI distribution from one of the following locations:
-
-* {url-artifact-repository}/org/springframework/boot/spring-boot-cli/{version-spring-boot}/spring-boot-cli-{version-spring-boot}-bin.zip[spring-boot-cli-{version-spring-boot}-bin.zip]
-* {url-artifact-repository}/org/springframework/boot/spring-boot-cli/{version-spring-boot}/spring-boot-cli-{version-spring-boot}-bin.tar.gz[spring-boot-cli-{version-spring-boot}-bin.tar.gz]
-endif::[]
-
-
-Once downloaded, follow the {url-github-raw}/spring-boot-project/spring-boot-tools/spring-boot-cli/src/main/content/INSTALL.txt[INSTALL.txt] instructions from the unpacked archive.
-In summary, there is a `spring` script (`spring.bat` for Windows) in a `bin/` directory in the `.zip` file.
-Alternatively, you can use `java -jar` with the `.jar` file (the script helps you to be sure that the classpath is set correctly).
-
-
+* Ways to download it manually
+    ** snapshot version
+        *** download one of the `spring-boot-cli-\*-bin.zip` or `spring-boot-cli-*-bin.tar.gz` files from the {url-artifact-repository}/org/springframework/boot/spring-boot-cli/{version-spring-boot}/[Spring software repository]
+    ** stable
+        *** {url-artifact-repository}/org/springframework/boot/spring-boot-cli/{version-spring-boot}/spring-boot-cli-{version-spring-boot}-bin.zip[spring-boot-cli-{version-spring-boot}-bin.zip]
+        *** {url-artifact-repository}/org/springframework/boot/spring-boot-cli/{version-spring-boot}/spring-boot-cli-{version-spring-boot}-bin.tar.gz[spring-boot-cli-{version-spring-boot}-bin.tar.gz]
+* How to install?
+    ** Follow the {url-github-raw}/spring-boot-project/spring-boot-tools/spring-boot-cli/src/main/content/INSTALL.txt[INSTALL.txt] instructions from the unpacked archive
+        *** == use `spring` script (`spring.bat` for Windows) in a `bin/` directory in the `.zip` file.
+            **** guarantee that the classpath is set correctly
+    *** `java -jar` with the `.jar` file
 
 [[getting-started.installing.cli.sdkman]]
 === Installation with SDKMAN!
@@ -145,19 +141,17 @@ Available Springboot Versions
 [[getting-started.installing.cli.homebrew]]
 === OSX Homebrew Installation
 
-If you are on a Mac and use https://brew.sh/[Homebrew], you can install the Spring Boot CLI by using the following commands:
+* requirements
+    ** Mac user
+* how to install it?
 
-[source,shell]
-----
-$ brew tap spring-io/tap
-$ brew install spring-boot
-----
+    [source,shell]
+    ----
+    $ brew tap spring-io/tap
+    $ brew install spring-boot
+    ----
 
-Homebrew installs `spring` to `/usr/local/bin`.
-
-NOTE: If you do not see the formula, your installation of brew might be out-of-date.
-In that case, run `brew update` and try again.
-
+    ** install it in `/usr/local/bin`
 
 
 [[getting-started.installing.cli.macports]]
