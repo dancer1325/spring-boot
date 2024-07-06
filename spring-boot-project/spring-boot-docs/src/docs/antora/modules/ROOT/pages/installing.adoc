@@ -1,31 +1,30 @@
 [[getting-started.installing]]
 = Installing Spring Boot
 
-Spring Boot can be used with "`classic`" Java development tools or installed as a command line tool.
-Either way, you need https://www.java.com[Java SDK v17] or higher.
-Before you begin, you should check your current Java installation by using the following command:
+* ways to use it
+    ** "`classic`" Java development tools
+    ** xref:installing.adoc#getting-started.installing.cli[Spring Boot CLI]
+* requirements
+    ** https://www.java.com[Java SDK v17+]
 
-[source,shell]
-----
-$ java -version
-----
-
-If you are new to Java development or if you want to experiment with Spring Boot, you might want to try the xref:installing.adoc#getting-started.installing.cli[Spring Boot CLI] (Command Line Interface) first.
-Otherwise, read on for "`classic`" installation instructions.
-
-
+    [source,shell]
+    ----
+    $ java -version
+    ----
 
 [[getting-started.installing.java]]
 == Installation Instructions for the Java Developer
 
-You can use Spring Boot in the same way as any standard Java library.
-To do so, include the appropriate `+spring-boot-*.jar+` files on your classpath.
-Spring Boot does not require any special tools integration, so you can use any IDE or text editor.
-Also, there is nothing special about a Spring Boot application, so you can run and debug a Spring Boot application as you would any other Java program.
-
-Although you _could_ copy Spring Boot jars, we generally recommend that you use a build tool that supports dependency management (such as Maven or Gradle).
-
-
+* == Spring Boot == any standard Java library
+    ** 👁️NOT special integration tool is required 👁
+        *** any IDE or text editor can be used
+    ** Run and debug a Spring Boot application == any other Java program
+* steps
+    ** include the appropriate `+spring-boot-*.jar+` files on your classpath
+        *** ways
+            **** copy Spring Boot jars
+            **** use a build tool / supports dependency management ( _Example:_ Maven or Gradle)
+                ***** Recommended
 
 [[getting-started.installing.java.maven]]
 === Maven Installation
