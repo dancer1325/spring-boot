@@ -1,27 +1,30 @@
 [[howto.hotswapping]]
-= Hot Swapping
+= Hot Swapping / Hot Reloading
 
-Spring Boot supports hot swapping.
-This section answers questions about how it works.
-
-
+Supported by Spring Boot
 
 [[howto.hotswapping.reload-static-content]]
 == Reload Static Content
-
-There are several options for hot reloading.
-The recommended approach is to use xref:reference:using/devtools.adoc[`spring-boot-devtools`], as it provides additional development-time features, such as support for fast application restarts and LiveReload as well as sensible development-time configuration (such as template caching).
-Devtools works by monitoring the classpath for changes.
-This means that static resource changes must be "built" for the change to take effect.
-By default, this happens automatically in Eclipse when you save your changes.
-In IntelliJ IDEA, the Make Project command triggers the necessary build.
-Due to the xref:reference:using/devtools.adoc#using.devtools.restart.excluding-resources[default restart exclusions], changes to static resources do not trigger a restart of your application.
-They do, however, trigger a live reload.
-
-Alternatively, running in an IDE (especially with debugging on) is a good way to do development (all modern IDEs allow reloading of static resources and usually also allow hot-swapping of Java class changes).
-
-Finally, the xref:build-tool-plugin:index.adoc[Maven and Gradle plugins] can be configured (see the `addResources` property) to support running from the command line with reloading of static files directly from source.
-You can use that with an external css/js compiler process if you are writing that code with higher-level tools.
+* There are several options
+    ** xref:reference:using/devtools.adoc[`spring-boot-devtools`]
+        *** Recommended
+            **** Reason: 🧠 provides additional development-time features -- _Example:_ support for fast application restarts and LiveReload, sensible development-time configuration (such as template caching) 🧠
+* if you want that static resource changes take effect -> you must "build"
+    ** based on the IDE
+        *** [Eclipse] once you save the file -> run it automatically
+        *** [IntelliJ IDEA] Make Project command -- triggers the -- necessary build
+    ** == changes to static resources
+        *** -- do NOT trigger a -- restart of your application
+            **** Reason: 🧠 xref:reference:using/devtools.adoc#using.devtools.restart.excluding-resources[default restart exclusions] 🧠
+        *** trigger a live reload ❓
+* ALL modern IDEs
+    ** allow
+        *** reloading of static resources
+        *** usually hot-swapping of Java class changes
+* xref:build-tool-plugin:index.adoc[Maven and Gradle plugins]
+    ** -- can be configured ( `addResources` property) to support --
+        *** running from the CL / reloading static files from source
+    ** + external css/js compiler process -- if you are writing that code with higher-level tools
 
 
 
