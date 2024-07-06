@@ -60,39 +60,34 @@ When reading the code, remember the following rules of thumb:
 [[howto.application.customize-the-environment-or-application-context]]
 == Customize the Environment or ApplicationContext Before It Starts
 
-A `SpringApplication` has `ApplicationListeners` and `ApplicationContextInitializers` that are used to apply customizations to the context or environment.
-Spring Boot loads a number of such customizations for use internally from `META-INF/spring.factories`.
-There is more than one way to register additional customizations:
+* `ApplicationListeners` and `ApplicationContextInitializers`
+    ** allows
+        *** -- applying customizations to -- context or environment
+    ** Check xref:reference:features/spring-application.adoc#features.spring-application.application-events-and-listeners[]
+* ways to register customizations
+    ** Spring Boot -- loads from -- `META-INF/spring.factories`
+    ** programmatically / application
+        *** == before you run `SpringApplication` -- call to the methods --  `addListeners` and `addInitializers`
+    ** declaratively / all applications by
+        *** adding a `META-INF/spring.factories`
+            **** for `Environment` -- via -- `EnvironmentPostProcessor`
 
-* Programmatically, per application, by calling the `addListeners` and `addInitializers` methods on `SpringApplication` before you run it.
-* Declaratively, for all applications, by adding a `META-INF/spring.factories` and packaging a jar file that the applications all use as a library.
+                [source]
+                ----
+                org.springframework.boot.env.EnvironmentPostProcessor=com.example.YourEnvironmentPostProcessor
+                ----
 
-The `SpringApplication` sends some special `ApplicationEvents` to the listeners (some even before the context is created) and then registers the listeners for events published by the `ApplicationContext` as well.
-See xref:reference:features/spring-application.adoc#features.spring-application.application-events-and-listeners[] in the "`Spring Boot Features`" section for a complete list.
+                ***** _Example:_ loads a .yaml -- from the -- classpath
 
-It is also possible to customize the `Environment` before the application context is refreshed by using `EnvironmentPostProcessor`.
-Each implementation should be registered in `META-INF/spring.factories`, as shown in the following example:
+                    include-code::MyEnvironmentPostProcessor[]
 
-[source]
-----
-org.springframework.boot.env.EnvironmentPostProcessor=com.example.YourEnvironmentPostProcessor
-----
-
-The implementation can load arbitrary files and add them to the `Environment`.
-For instance, the following example loads a YAML configuration file from the classpath:
-
-include-code::MyEnvironmentPostProcessor[]
-
-TIP: The `Environment` has already been prepared with all the usual property sources that Spring Boot loads by default.
-It is therefore possible to get the location of the file from the environment.
-The preceding example adds the `custom-resource` property source at the end of the list so that a key defined in any of the usual other locations takes precedence.
-A custom implementation may define another order.
-
-CAUTION: While using `@PropertySource` on your `@SpringBootApplication` may seem to be a convenient way to load a custom resource in the `Environment`, we do not recommend it.
-Such property sources are not added to the `Environment` until the application context is being refreshed.
-This is too late to configure certain properties such as `+logging.*+` and `+spring.main.*+` which are read before refresh begins.
-
-
+        *** packaging a ".jar" / ALL applications use as a library
+* `Environment`
+    ** 👁️already prepared with ALL the usual property sources / Spring Boot -- loads -- by default 👁️
+        *** -> -- from the environment -- possible to get the location of the file
+    ** 👁️ `@PropertySource` -- is NOT the recommended way to load -- a custom resource in the `Environment` 👁️
+        *** Reason: 🧠 Once application context is being refreshed -> it's added 🧠
+            **** -> too late to configure certain properties / are read before refresh begins -- _Example:_ `+logging.*+` and `+spring.main.*+` --
 
 [[howto.application.context-hierarchy]]
 == Build an ApplicationContext Hierarchy (Adding a Parent or Root Context)
