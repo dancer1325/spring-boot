@@ -23,7 +23,8 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootConfiguration(proxyBeanMethods = false)
 @EnableAutoConfiguration
-@Import({ SomeConfiguration.class, AnotherConfiguration.class })
+//@ComponentScan 		NOT used -> NO sense to use @SpringBootApplication
+@Import({ SomeConfiguration.class, AnotherConfiguration.class })			// Import explicitly the classes, rather than being detected automatically
 public class MyApplication {
 
 	public static void main(String[] args) {
