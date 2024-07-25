@@ -1,9 +1,14 @@
 [[testing.spring-boot-applications]]
 = Testing Spring Boot Applications
 
-A Spring Boot application is a Spring `ApplicationContext`, so nothing very special has to be done to test it beyond what you would normally do with a vanilla Spring context.
+* Spring Boot application
+    ** == Spring `ApplicationContext`
+        *** -> testing Spring Boot application == testing vanilla Spring context
+    ** if you use `SpringApplication` -> features of Spring Boot (_Example:_ external properties, logging) are installed in the context by default
 
-NOTE: External properties, logging, and other features of Spring Boot are installed in the context by default only if you use `SpringApplication` to create it.
+
+* TODO:
+
 
 Spring Boot provides a `@SpringBootTest` annotation, which can be used as an alternative to the standard `spring-test` `@ContextConfiguration` annotation when you need Spring Boot features.
 The annotation works by xref:testing/spring-boot-applications.adoc#testing.spring-boot-applications.detecting-configuration[creating the `ApplicationContext` used in your tests through `SpringApplication`].
