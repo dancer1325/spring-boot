@@ -1,67 +1,60 @@
 [[actuator.micrometer-tracing]]
 = Tracing
 
-Spring Boot Actuator provides dependency management and auto-configuration for {url-micrometer-tracing-docs}[Micrometer Tracing], a facade for popular tracer libraries.
-
-TIP: To learn more about Micrometer Tracing capabilities, see its {url-micrometer-tracing-docs}[reference documentation].
-
+* {url-micrometer-tracing-docs}[Micrometer Tracing]
+    ** Spring Boot Actuator -- provides for it --
+        *** dependency management
+        *** auto-configuration
+    ** == facade -- for -- popular tracer libraries
+    ** Check {url-micrometer-tracing-docs}[reference documentation]
 
 
 [[actuator.micrometer-tracing.tracers]]
-== Supported Tracers
+== Supported Tracers / provided auto-configuration by Spring Boot
 
-Spring Boot ships auto-configuration for the following tracers:
-
-* https://opentelemetry.io/[OpenTelemetry] with https://zipkin.io/[Zipkin],  https://docs.wavefront.com/[Wavefront], or https://opentelemetry.io/docs/reference/specification/protocol/[OTLP]
-* https://github.com/openzipkin/brave[OpenZipkin Brave] with https://zipkin.io/[Zipkin] or https://docs.wavefront.com/[Wavefront]
-
-
+* https://opentelemetry.io/[OpenTelemetry] with
+    ** https://zipkin.io/[Zipkin]
+    ** https://docs.wavefront.com/[Wavefront] or
+    ** https://opentelemetry.io/docs/reference/specification/protocol/[OTLP]
+* https://github.com/openzipkin/brave[OpenZipkin Brave] with
+    ** https://zipkin.io/[Zipkin] or
+    ** https://docs.wavefront.com/[Wavefront]
 
 [[actuator.micrometer-tracing.getting-started]]
 == Getting Started
 
-We need an example application that we can use to get started with tracing.
-For our purposes, the simple "`Hello World!`" web application that's covered in the xref:tutorial:first-application/index.adoc[] section will suffice.
-We're going to use the OpenTelemetry tracer with Zipkin as trace backend.
-
-To recap, our main application code looks like this:
+* Goal
+    ** OpenTelemetry tracer + Zipkin as trace backend
+* xref:tutorial:first-application/index.adoc[]
+    ** simple "`Hello World!`" web application
 
 include-code::MyApplication[]
 
-NOTE: There's an added logger statement in the `home()` method, which will be important later.
+* steps
+    ** add the following dependencies
 
-Now we have to add the following dependencies:
+ org.springframework.boot:spring-boot-starter-actuator
+ io.micrometer:micrometer-tracing-bridge-otel // Micrometer Observation API -- is bridged to -- OpenTelemetry
+ io.opentelemetry:opentelemetry-exporter-zipkin // {url-micrometer-tracing-docs}/glossary[traces] -- are reported to -- Zipkin
 
-* `org.springframework.boot:spring-boot-starter-actuator`
-* `io.micrometer:micrometer-tracing-bridge-otel` - bridges the Micrometer Observation API to OpenTelemetry.
-* `io.opentelemetry:opentelemetry-exporter-zipkin` - reports {url-micrometer-tracing-docs}/glossary[traces] to Zipkin.
+    ** add the following application property
 
-Add the following application properties:
+    management:
+      tracing:
+        sampling:
+          probability: 1.0
 
-[configprops,yaml]
-----
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-----
+        *** 👁️ % of requests -- sent to the -- trace backend 👁️
+        *** by default, it's 10% (== management.tracing.sampling.probability=0.1)
 
-By default, Spring Boot samples only 10% of requests to prevent overwhelming the trace backend.
-This property switches it to 100% so that every request is sent to the trace backend.
+    ** run a trace backend
+        *** https://zipkin.io/pages/quickstart[Zipkin Quickstart guide, to start it locally]
+    ** `mvn spring-boot:run`
+    ** open a web browser to `http://localhost:8080`, you should see the following output:
 
-To collect and visualize the traces, we need a running trace backend.
-We use Zipkin as our trace backend here.
-The https://zipkin.io/pages/quickstart[Zipkin Quickstart guide] provides instructions how to start Zipkin locally.
+        Hello World!
 
-After Zipkin is running, you can start your application.
-
-If you open a web browser to `http://localhost:8080`, you should see the following output:
-
-[source]
-----
-Hello World!
-----
-
+// TODO: From here
 Behind the scenes, an observation has been created for the HTTP request, which in turn gets bridged to OpenTelemetry, which reports a new trace to Zipkin.
 
 Now open the Zipkin UI at `http://localhost:9411` and press the "Run Query" button to list all collected traces.

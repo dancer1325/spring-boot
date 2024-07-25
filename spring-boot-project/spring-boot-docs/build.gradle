@@ -71,6 +71,8 @@ dependencies {
 	implementation("com.zaxxer:HikariCP")
 	implementation("io.micrometer:micrometer-jakarta9")
 	implementation("io.micrometer:micrometer-tracing")
+	implementation("io.micrometer:micrometer-tracing-bridge-otel")
+	implementation("io.opentelemetry:opentelemetry-exporter-zipkin")
 	implementation("io.micrometer:micrometer-registry-graphite")
 	implementation("io.micrometer:micrometer-registry-jmx")
 	implementation("io.projectreactor.netty:reactor-netty-http")
