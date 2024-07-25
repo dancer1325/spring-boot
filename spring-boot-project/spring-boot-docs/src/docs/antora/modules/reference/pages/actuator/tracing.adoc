@@ -44,13 +44,14 @@ include-code::MyApplication[]
         sampling:
           probability: 1.0
 
-        *** 👁️ % of requests -- sent to the -- trace backend 👁️
+        *** 👁️ /1 of requests -- sent to the -- trace backend 👁️
         *** by default, it's 10% (== management.tracing.sampling.probability=0.1)
 
     ** run a trace backend
         *** https://zipkin.io/pages/quickstart[Zipkin Quickstart guide, to start it locally]
     ** `mvn spring-boot:run`
-    ** open a web browser to `http://localhost:8080`, you should see the following output:
+    ** open a web browser to `http://localhost:8080`
+        *** you get
 
         Hello World!
 
