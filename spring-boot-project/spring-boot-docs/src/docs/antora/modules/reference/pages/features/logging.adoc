@@ -1,25 +1,27 @@
 [[features.logging]]
 = Logging
 
-Spring Boot uses https://commons.apache.org/logging[Commons Logging] for all internal logging but leaves the underlying log implementation open.
-Default configurations are provided for {apiref-openjdk}/java.logging/java/util/logging/package-summary.html[Java Util Logging], https://logging.apache.org/log4j/2.x/[Log4j2], and https://logback.qos.ch/[Logback].
-In each case, loggers are pre-configured to use console output with optional file output also available.
-
-By default, if you use the starters, Logback is used for logging.
-Appropriate Logback routing is also included to ensure that dependent libraries that use Java Util Logging, Commons Logging, Log4J, or SLF4J all work correctly.
-
-TIP: There are a lot of logging frameworks available for Java.
-Do not worry if the above list seems confusing.
-Generally, you do not need to change your logging dependencies and the Spring Boot defaults work just fine.
-
-TIP: When you deploy your application to a servlet container or application server, logging performed with the Java Util Logging API is not routed into your application's logs.
-This prevents logging performed by the container or other applications that have been deployed to it from appearing in your application's logs.
-
+* Spring Boot
+    ** https://commons.apache.org/logging[Apache Commons Logging] used for 👁️ ALL internal logging 👁️
+    ** 👁️ BUT underlying log implementation is open 👁️
+        *** _Example:_
+            **** {apiref-openjdk}/java.logging/java/util/logging/package-summary.html[Java Util Logging]
+            **** https://logging.apache.org/log4j/2.x/[Log4j2]
+            **** https://logback.qos.ch/[Logback]
+        *** loggers
+            **** are pre-configured / use console output
+            **** optional file output
+        *** 👁️ if you use the starters -> Logback is used 👁️/ include
+            **** appropriate Logback routing /
+                ***** dependent libraries / use Java Util Logging, Commons Logging, Log4J, or SLF4J work ALL correctly
+* if you use Java Util Logging API & you deploy your application | servlet container -> logging is NOT routed | your application's logs
+    ** -> logging performed by the container or other applications / have been deployed to it -- are prevented to -- appear | your application's logs
 
 
 [[features.logging.log-format]]
 == Log Format
 
+* TODO: fROM HERE
 The default log output from Spring Boot resembles the following example:
 
 [source]
