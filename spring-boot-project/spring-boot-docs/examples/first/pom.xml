@@ -33,7 +33,18 @@
 			<artifactId>opentelemetry-exporter-zipkin</artifactId>
 			<version>1.40.0</version>
 		</dependency>
-
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-bom</artifactId>
+				<version>1.13.2</version>
+				<type>pom</type>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
 
 </project>
