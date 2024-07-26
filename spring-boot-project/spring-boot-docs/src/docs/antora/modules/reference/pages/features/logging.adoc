@@ -3,19 +3,22 @@
 
 * Spring Boot
     ** https://commons.apache.org/logging[Apache Commons Logging] used for 👁️ ALL internal logging 👁️
-    ** 👁️ BUT underlying log implementation is open 👁️
-        *** _Example:_
-            **** {apiref-openjdk}/java.logging/java/util/logging/package-summary.html[Java Util Logging]
-            **** https://logging.apache.org/log4j/2.x/[Log4j2]
-            **** https://logback.qos.ch/[Logback]
+    ** 👁️ BUT underlying log implementation is open to be chosen 👁️
         *** loggers
             **** are pre-configured / use console output
             **** optional file output
+            **** available ones
+                ***** {apiref-openjdk}/java.logging/java/util/logging/package-summary.html[Java Util Logging]
+                ***** https://logging.apache.org/log4j/2.x/[Log4j2]
+                ***** https://logback.qos.ch/[Logback]
         *** 👁️ if you use the starters -> Logback is used 👁️/ include
-            **** appropriate Logback routing /
-                ***** dependent libraries / use Java Util Logging, Commons Logging, Log4J, or SLF4J work ALL correctly
-* if you use Java Util Logging API & you deploy your application | servlet container -> logging is NOT routed | your application's logs
-    ** -> logging performed by the container or other applications / have been deployed to it -- are prevented to -- appear | your application's logs
+            **** appropriate Logback routing / dependent libraries work properly, although they use
+                ***** Java Util Logging
+                ***** Commons Logging
+                ***** Log4J
+                ***** SLF4J
+        *** 👁️ if you use Java Util Logging API & you deploy your application | servlet container -> logging is NOT routed | your application's logs 👁️
+            **** -> logging performed by the container or other applications / have been deployed to it -- are prevented to -- appear | your application's logs
 
 
 [[features.logging.log-format]]
