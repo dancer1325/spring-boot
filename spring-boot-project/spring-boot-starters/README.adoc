@@ -1,24 +1,16 @@
 = Starters
 
-Spring Boot Starters are a set of convenient dependency descriptors that you can include
-in your application. You get a one-stop-shop for all the Spring and related technology
-that you need without having to hunt through sample code and copy paste loads of
-dependency descriptors. For example, if you want to get started using Spring and
-JPA for database access include the `spring-boot-starter-data-jpa` dependency in
-your project, and you are good to go.
-
-For complete details see the
-https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter[reference documentation]
+* == set of convenient dependency descriptors / you can include | your application
+    ** _Example: if you want to get started using Spring + JPA -> include `spring-boot-starter-data-jpa` dependency | your project
+* check https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter[reference documentation]
 
 == Community Contributions
 
-If you create a starter for a technology that is not already in the standard list we can
-list it here. To ask us to do so, please open a pull request that updates this page.
-
-WARNING: While the
-https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter[reference documentation]
-mentions that 3rd party starters should not start with `spring-boot`, some starters
-do as they were designed before this was clarified.
+* if you create a starter -- for a -- technology / is NOT already in the standard list -> we can
+list it here
+* ⚠️3rd party starters should NOT start with `spring-boot` ⚠️
+    ** check https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter[reference documentation]
+    ** some 3rd party starters do, because they were designed before this was clarified
 
 |===
 | Name | Location
