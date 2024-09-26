@@ -736,19 +736,22 @@ Finally, only standard Java Bean properties are considered and binding on static
 [[features.external-config.typesafe-configuration-properties.constructor-binding]]
 === Constructor Binding
 
-The example in the previous section can be rewritten in an immutable fashion as shown in the following example:
+* _Example:_ previous example / rewrite -- in an -- immutable fashion way
 
 include-code::MyProperties[]
 
-In this setup, the presence of a single parameterized constructor implies that constructor binding should be used.
-This means that the binder will find a constructor with the parameters that you wish to have bound.
-If your class has multiple constructors, the `@ConstructorBinding` annotation can be used to specify which constructor to use for constructor binding.
-To opt out of constructor binding for a class with a single parameterized constructor, the constructor must be annotated with `@Autowired` or made `private`.
-Constructor binding can be used with records.
-Unless your record has multiple constructors, there is no need to use `@ConstructorBinding`.
-
-Nested members of a constructor bound class (such as `Security` in the example above) will also be bound through their constructor.
-
+* allows
+    ** binder -- finds a -- constructor / include wished bounded parameters
+* ⚠️ if you have 1! parameterized constructor -> constructor binding -- automatically -- is done ⚠️
+    ** ways to avoid this behavior
+        *** `@Autowired` | constructor
+        *** makes the constructor `private`
+* if your class has multiple constructors -> `@ConstructorBinding` | constructor / -- is going to be used for -- constructor binding
+* uses
+    ** | records / has multiple constructors
+        *** Reason: 🧠if there is 1! constructor -> NO need to use `@ConstructorBinding` 🧠
+* Nested members of a constructor bound class (_Example:_ `Security` ) -- will also be bound through -- their constructor
+* TODO:
 Default values can be specified using `@DefaultValue` on constructor parameters and record components.
 The conversion service will be applied to coerce the annotation's `String` value to the target type of a missing property.
 
@@ -757,11 +760,16 @@ To make it contain a non-null instance of `Security` even when no properties are
 
 include-code::nonnull/MyProperties[tag=*]
 
-NOTE: To use constructor binding the class must be enabled using `@EnableConfigurationProperties` or configuration property scanning.
-You cannot use constructor binding with beans that are created by the regular Spring mechanisms (for example `@Component` beans, beans created by using `@Bean` methods or beans loaded by using `@Import`)
-
-NOTE: To use constructor binding the class must be compiled with `-parameters`.
-This will happen automatically if you use Spring Boot's Gradle plugin or if you use Maven and `spring-boot-starter-parent`.
+* requirements to use constructor binding
+    ** | class
+        *** `@EnableConfigurationProperties` OR
+        *** configuration property scanning
+    ** class -- must be compiled with -- `-parameters`
+        *** done automatically, if you use
+            **** Spring Boot's Gradle plugin or
+            **** Maven `spring-boot-starter-parent`
+* NOT possible to use
+    ** | beans / -- created by -- regular Spring mechanisms (_Example:_ `@Component`, `@Bean` | methods or loaded -- by -- `@Import`)
 
 NOTE: The use of `java.util.Optional` with `@ConfigurationProperties` is not recommended as it is primarily intended for use as a return type.
 As such, it is not well-suited to configuration property injection.
