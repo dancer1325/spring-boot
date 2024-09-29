@@ -530,12 +530,11 @@ WARNING: Multi-document property files cannot be loaded by using the `@PropertyS
 [[features.external-config.files.activation-properties]]
 === Activation Properties
 
-It is sometimes useful to only activate a given set of properties when certain conditions are met.
-For example, you might have properties that are only relevant when a specific profile is active.
-
-You can conditionally activate a properties document using `spring.config.activate.*`.
-
-The following activation properties are available:
+* activate properties -- based on -- certain conditions
+* use cases
+    ** properties / active | specific profile
+* `spring.config.activate.*`
+    **  built-in
 
 .activation properties
 [cols="1,4"]
@@ -543,13 +542,13 @@ The following activation properties are available:
 | Property | Note
 
 | `on-profile`
-| A profile expression that must match for the document to be active.
+| == profile expression -- to active the -- property
 
 | `on-cloud-platform`
-| The `CloudPlatform` that must be detected for the document to be active.
+| == `CloudPlatform`
 |===
 
-For example, the following specifies that the second document is only active when running on Kubernetes, and only when either the "`prod`" or "`staging`" profiles are active:
+* _Example:_ if running on Kubernetes & "`prod`" or "`staging`" profiles are active -> `myotherprop: "sometimes-set"`
 
 [configprops%novalidate,yaml]
 ----
@@ -569,11 +568,14 @@ myotherprop: "sometimes-set"
 [[features.external-config.encrypting]]
 == Encrypting Properties
 
-Spring Boot does not provide any built-in support for encrypting property values, however, it does provide the hook points necessary to modify values contained in the Spring `Environment`.
-The `EnvironmentPostProcessor` interface allows you to manipulate the `Environment` before the application starts.
-See xref:how-to:application.adoc#howto.application.customize-the-environment-or-application-context[] for details.
-
-If you need a secure way to store credentials and passwords, the https://cloud.spring.io/spring-cloud-vault/[Spring Cloud Vault] project provides support for storing externalized configuration in https://www.vaultproject.io/[HashiCorp Vault].
+* 👁️ NOT any built-in support -- for -- encrypting property values 👁️
+* hook points / -- necessary to -- modify values | Spring `Environment`
+    ** `EnvironmentPostProcessor` interface
+        *** allows
+            **** manipulating the `Environment` | before application starts
+        *** check xref:how-to:application.adoc#howto.application.customize-the-environment-or-application-context[]
+* if you need a secure way to store credentials and passwords -> check https://cloud.spring.io/spring-cloud-vault/[Spring Cloud Vault]
+    ** store configuration | https://www.vaultproject.io/[HashiCorp Vault]
 
 
 
