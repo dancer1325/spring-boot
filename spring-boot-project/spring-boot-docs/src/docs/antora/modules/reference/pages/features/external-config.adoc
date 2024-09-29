@@ -450,12 +450,22 @@
 [[features.external-config.files.property-placeholders]]
 === Property Placeholders
 
-* TODO:
-The values in `application.properties` and `application.yaml` are filtered through the existing `Environment` when they are used, so you can refer back to previously defined values (for example, from System properties or environment variables).
-The standard `$\{name}` property-placeholder syntax can be used anywhere within a value.
-Property placeholders can also specify a default value using a `:` to separate the default value from the property name, for example `${name:default}`.
-
-The use of placeholders with and without defaults is shown in the following example:
+* values | `application.properties` & `application.yaml` -- are filtered through the -- existing `Environment`
+    ** -> you can -- refer back to -- previously defined values
+        *** _Example:_ System properties or environment variables
+* property-placeholder syntax -- `${propertyName:defaultValue}` --
+    ** -- can be used -- ANYWHERE | value
+        *** _Example:_ `$\{name}`
+    ** -- can specify a -- default value
+        *** _Example:_ `${name:default}`
+    ** `propertyName` -- must be specified via -- canonical form ( == kebab-case & lowercase letters)
+        *** == logic to xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding[relaxed binding] `@ConfigurationProperties`
+        *** _Example1:_ `${demo.item-price}` will pick up
+            **** `demo.item-price` & `demo.itemPrice` forms | `application.properties`
+            **** `DEMO_ITEMPRICE` | system environment
+        *** _Example2:_ `${demo.itemPrice}` will pick up
+            **** `demo.item-price`, BUT NOT `DEMO_ITEMPRICE`
+* _Example:_
 
 [configprops%novalidate,yaml]
 ----
@@ -464,24 +474,15 @@ app:
   description: "${app.name} is a Spring Boot application written by ${username:Unknown}"
 ----
 
-Assuming that the `username` property has not been set elsewhere, `app.description` will have the value `MyApp is a Spring Boot application written by Unknown`.
-
-[NOTE]
-====
-You should always refer to property names in the placeholder using their canonical form (kebab-case using only lowercase letters).
-This will allow Spring Boot to use the same logic as it does when xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding[relaxed binding] `@ConfigurationProperties`.
-
-For example, `${demo.item-price}` will pick up `demo.item-price` and `demo.itemPrice` forms from the `application.properties` file, as well as `DEMO_ITEMPRICE` from the system environment.
-If you used `${demo.itemPrice}` instead, `demo.item-price` and `DEMO_ITEMPRICE` would not be considered.
-====
-
-TIP: You can also use this technique to create "`short`" variants of existing Spring Boot properties.
-See the xref:how-to:properties-and-configuration.adoc#howto.properties-and-configuration.short-command-line-arguments[] section in "`How-to Guides`" for details.
+* you can create "`short`" variants
+    ** check xref:how-to:properties-and-configuration.adoc#howto.properties-and-configuration.short-command-line-arguments[]
 
 
 
 [[features.external-config.files.multi-document]]
 === Working With Multi-Document Files
+
+* TODO:
 
 Spring Boot allows you to split a single physical file into multiple logical documents which are each added independently.
 Documents are processed in order, from top to bottom.
@@ -756,17 +757,18 @@ include-code::MyProperties[]
     ** ways to avoid this behavior
         *** `@Autowired` | constructor
         *** makes the constructor `private`
-* if your class has multiple constructors -> `@ConstructorBinding` | constructor / -- is going to be used for -- constructor binding
+* if your class has multiple constructors -> use `@ConstructorBinding` | constructor
 * uses
     ** | records / has multiple constructors
         *** Reason: 🧠if there is 1! constructor -> NO need to use `@ConstructorBinding` 🧠
 * Nested members of a constructor bound class (_Example:_ `Security` ) -- will also be bound through -- their constructor
-* TODO:
-Default values can be specified using `@DefaultValue` on constructor parameters and record components.
-The conversion service will be applied to coerce the annotation's `String` value to the target type of a missing property.
+    ** if NO properties are bound to nested member ->
+        *** `null` value
+        *** default value, if you have specified | property
+* `@DefaultValue` | constructor parameters & record components
+    ** allows
+        *** specifying default values
 
-Referring to the previous example, if no properties are bound to `Security`, the `MyProperties` instance will contain a `null` value for `security`.
-To make it contain a non-null instance of `Security` even when no properties are bound to it (when using Kotlin, this will require the `username` and `password` parameters of `Security` to be declared as nullable as they do not have default values), use an empty `@DefaultValue` annotation:
 
 include-code::nonnull/MyProperties[tag=*]
 
@@ -780,16 +782,17 @@ include-code::nonnull/MyProperties[tag=*]
             **** Maven `spring-boot-starter-parent`
 * NOT possible to use
     ** | beans / -- created by -- regular Spring mechanisms (_Example:_ `@Component`, `@Bean` | methods or loaded -- by -- `@Import`)
-
-NOTE: The use of `java.util.Optional` with `@ConfigurationProperties` is not recommended as it is primarily intended for use as a return type.
-As such, it is not well-suited to configuration property injection.
-For consistency with properties of other types, if you do declare an `Optional` property and it has no value, `null` rather than an empty `Optional` will be bound.
-
+* NOT recommended
+    ** `java.util.Optional` + `@ConfigurationProperties`
+        *** Reason: 🧠`java.util.Optional` primarily intended -- for use as -- a return type 🧠
+        *** if you use it & property has NO value -> `null` rather than an empty `Optional` will be bound
+            **** Reason: 🧠 -- consistency with -- properties of other types 🧠
 
 
 [[features.external-config.typesafe-configuration-properties.enabling-annotated-types]]
 === Enabling @ConfigurationProperties-annotated Types
 
+* TODO:
 Spring Boot provides infrastructure to bind `@ConfigurationProperties` types and register them as beans.
 You can either enable configuration properties on a class-by-class basis or enable configuration property scanning that works in a similar manner to component scanning.
 
