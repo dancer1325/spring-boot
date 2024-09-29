@@ -687,11 +687,18 @@ For example, if you set the prefix to `input`, a property such as `remote.timeou
 [[features.external-config.typesafe-configuration-properties]]
 == Type-safe Configuration Properties
 
-Using the `@Value("$\{property}")` annotation to inject configuration properties can sometimes be cumbersome, especially if you are working with multiple properties or your data is hierarchical in nature.
-Spring Boot provides an alternative method of working with properties that lets strongly typed beans govern and validate the configuration of your application.
-
-TIP: See also the xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.vs-value-annotation[differences between `@Value` and type-safe configuration properties].
-
+* `@Value("$\{property}")`
+    ** can cumbersome
+        *** use cases
+            **** working with multiple properties
+            **** your data is hierarchical
+* `@ConfigurationProperties`
+    ** type-safe configuration properties
+    ** alternative to previous one
+    ** allows
+        *** strongly typed beans
+        *** validate the configuration
+    ** xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.vs-value-annotation[`@Value` vs `@ConfigurationProperties`]
 
 
 [[features.external-config.typesafe-configuration-properties.java-bean-binding]]
@@ -854,14 +861,16 @@ Any JavaBean property defined with the `another` prefix is mapped onto that `Ano
 [[features.external-config.typesafe-configuration-properties.relaxed-binding]]
 === Relaxed Binding
 
-Spring Boot uses some relaxed rules for binding `Environment` properties to `@ConfigurationProperties` beans, so there does not need to be an exact match between the `Environment` property name and the bean property name.
-Common examples where this is useful include dash-separated environment properties (for example, `context-path` binds to `contextPath`), and capitalized environment properties (for example, `PORT` binds to `port`).
-
-As an example, consider the following `@ConfigurationProperties` class:
+* relaxed rules / bind `Environment` properties -- to -- `@ConfigurationProperties` beans
+    ** -> NOT need an exact match between the `Environment` property name -- & -- bean property name
+    ** uses
+        *** dash-separated environment properties
+            **** _Example:_ `context-path` -- binds to -- `contextPath`
+        *** capitalized environment properties
+            **** _Example:_ `PORT` -- binds to -- `port`
+* _Example:_
 
 include-code::MyPersonProperties[]
-
-With the preceding code, the following properties names can all be used:
 
 .relaxed binding
 [cols="1,4"]
@@ -869,44 +878,70 @@ With the preceding code, the following properties names can all be used:
 | Property | Note
 
 | `my.main-project.person.first-name`
-| Kebab case, which is recommended for use in `.properties` and YAML files.
+| Kebab case
+
+recommended for `.properties` and YAML files
 
 | `my.main-project.person.firstName`
-| Standard camel case syntax.
+| Standard camel case syntax
 
 | `my.main-project.person.first_name`
-| Underscore notation, which is an alternative format for use in `.properties` and YAML files.
+| Underscore notation
+
+alternative format for `.properties` and YAML files
 
 | `MY_MAINPROJECT_PERSON_FIRSTNAME`
-| Upper case format, which is recommended when using system environment variables.
+| Upper case format
+
+recommended for system environment variables
 |===
 
-NOTE: The `prefix` value for the annotation _must_ be in kebab case (lowercase and separated by `-`, such as `my.main-project.person`).
+* `ConfigurationProperties(prefix="something-lowercase-and-kebabcase)`
+    ** _Example:_ `my.main-project.person`
 
-.relaxed binding rules per property source
+.relaxed binding rules / property source
 [cols="2,4,4"]
 |===
 | Property Source | Simple | List
 
 | Properties Files
-| Camel case, kebab case, or underscore notation
-| Standard list syntax using `[ ]` or comma-separated values
+| Camel case
+
+kebab case
+
+underscore notation
+| Standard list syntax -- via -- `[]` or
+
+comma-separated == `value1, value2, ...`
 
 | YAML Files
-| Camel case, kebab case, or underscore notation
-| Standard YAML list syntax or comma-separated values
+| Camel case
+
+kebab case
+
+underscore notation
+| Standard YAML list syntax -- via -- `[]` or
+
+comma-separated values `value1, value2, ...`
 
 | Environment Variables
-| Upper case format with underscore as the delimiter (see xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables[]).
-| Numeric values surrounded by underscores (see xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables[])
+| Upper case format / `_` as delimiter
+
+check xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables[]
+| Numeric values / surrounded by `_`
+
+check  xref:features/external-config.adoc#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables[]
 
 | System properties
-| Camel case, kebab case, or underscore notation
-| Standard list syntax using `[ ]` or comma-separated values
+| Camel case
+
+kebab case
+
+underscore notation
+| Standard list syntax -- via -- `[]` or
+
+comma-separated  == `value1, value2, ...`
 |===
-
-TIP: We recommend that, when possible, properties are stored in lower-case kebab format, such as `my.person.first-name=Rod`.
-
 
 
 [[features.external-config.typesafe-configuration-properties.relaxed-binding.maps]]
@@ -1175,35 +1210,34 @@ Doing so gives a transparent upgrade path while supporting a much richer format.
 [[features.external-config.typesafe-configuration-properties.validation]]
 === @ConfigurationProperties Validation
 
-Spring Boot attempts to validate `@ConfigurationProperties` classes whenever they are annotated with Spring's `@Validated` annotation.
-You can use JSR-303 `jakarta.validation` constraint annotations directly on your configuration class.
-To do so, ensure that a compliant JSR-303 implementation is on your classpath and then add constraint annotations to your fields, as shown in the following example:
+* requirements to validate
+    ** `@ConfigurationProperties` + `@Validated` JSR-303 `jakarta.validation` | class
+    ** JSR-303 implementation | classpath & constraint annotations | fields
 
 include-code::MyProperties[]
 
-TIP: You can also trigger validation by annotating the `@Bean` method that creates the configuration properties with `@Validated`.
-
-To cascade validation to nested properties the associated field must be annotated with `@Valid`.
-The following example builds on the preceding `MyProperties` example:
+* if you want to cascade validation | nested properties -> `@Valid` | associated field
 
 include-code::nested/MyProperties[]
 
-You can also add a custom Spring `Validator` by creating a bean definition called `configurationPropertiesValidator`.
-The `@Bean` method should be declared `static`.
-The configuration properties validator is created very early in the application's lifecycle, and declaring the `@Bean` method as static lets the bean be created without having to instantiate the `@Configuration` class.
-Doing so avoids any problems that may be caused by early instantiation.
+* steps to add a custom Spring `Validator`
+    ** create a bean definition /
+        *** called `configurationPropertiesValidator`
+        *** declare `static`
+            **** -> bean is created / WITHOUT having to instantiate the `@Configuration` class
+            **** Reason: 🧠configuration properties validator is created very early | application's lifecycle 🧠
 
-TIP: The `spring-boot-actuator` module includes an endpoint that exposes all `@ConfigurationProperties` beans.
-Point your web browser to `/actuator/configprops` or use the equivalent JMX endpoint.
-See the xref:actuator/endpoints.adoc[Production ready features] section for details.
-
+* `/actuator/configprops` or equivalent JMX endpoint
+    ** == `spring-boot-actuator` 's endpoint / exposes all `@ConfigurationProperties` beans
+    ** check xref:actuator/endpoints.adoc[Production ready features]
 
 
 [[features.external-config.typesafe-configuration-properties.vs-value-annotation]]
 === @ConfigurationProperties vs. @Value
 
-The `@Value` annotation is a core container feature, and it does not provide the same features as type-safe configuration properties.
-The following table summarizes the features that are supported by `@ConfigurationProperties` and `@Value`:
+* `@Value` is a core container feature
+* != features provide
+
 
 [cols="4,2,2"]
 |===
