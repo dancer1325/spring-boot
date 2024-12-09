@@ -1,15 +1,18 @@
 [[testing]]
 = Testing
 
-Spring Boot provides a number of utilities and annotations to help when testing your application.
-Test support is provided by two modules: `spring-boot-test` contains core items, and `spring-boot-test-autoconfigure` supports auto-configuration for tests.
+* testing modules / -- provided by -- Spring
+    ** `spring-boot-test`
+        *** == core items
+    ** `spring-boot-test-autoconfigure`
+        *** == auto-configuration for tests
 
-Most developers use the `spring-boot-starter-test` starter, which imports both Spring Boot test modules as well as JUnit Jupiter, AssertJ, Hamcrest, and a number of other useful libraries.
+* `spring-boot-starter-test` starter
+    ** == Spring Boot test modules + JUnit Jupiter + AssertJ + Hamcrest + others
+    ** MOST recommended one
 
-[TIP]
-====
-If you have tests that use JUnit 4, JUnit 5's vintage engine can be used to run them.
-To use the vintage engine, add a dependency on `junit-vintage-engine`, as shown in the following example:
+* if you have tests / use JUnit 4 -> JUnit 5's vintage engine -- can be used to -- run them
+    ** add the `junit-vintage-engine` dependency
 
 [source,xml]
 ----
@@ -18,6 +21,7 @@ To use the vintage engine, add a dependency on `junit-vintage-engine`, as shown 
 	<artifactId>junit-vintage-engine</artifactId>
 	<scope>test</scope>
 	<exclusions>
+	    <!-- `hamcrest-core` - is excluded in favor of - `spring-boot-starter-test`'s `org.hamcrest:hamcrest` -->
 		<exclusion>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
@@ -25,6 +29,3 @@ To use the vintage engine, add a dependency on `junit-vintage-engine`, as shown 
 	</exclusions>
 </dependency>
 ----
-====
-
-`hamcrest-core` is excluded in favor of `org.hamcrest:hamcrest` that is part of `spring-boot-starter-test`.
