@@ -1,14 +1,21 @@
 [[testing.spring-applications]]
 = Testing Spring Applications
 
-One of the major advantages of dependency injection is that it should make your code easier to unit test.
-You can instantiate objects by using the `new` operator without even involving Spring.
-You can also use _mock objects_ instead of real dependencies.
+* dependency injection
+    ** -> code -- is easier to -- unit test
 
-Often, you need to move beyond unit testing and start integration testing (with a Spring `ApplicationContext`).
-It is useful to be able to perform integration testing without requiring deployment of your application or needing to connect to other infrastructure.
+* if you want to instantiate objects -> use `new` operator
+    ** == NO involve Spring
 
-The Spring Framework includes a dedicated test module for such integration testing.
-You can declare a dependency directly to `org.springframework:spring-test` or use the `spring-boot-starter-test` starter to pull it in transitively.
+* if you do NOT want real dependencies -> use _mock objects_
 
-If you have not used the `spring-test` module before, you should start by reading the {url-spring-framework-docs}/testing.html[relevant section] of the Spring Framework reference documentation.
+* integration testing
+    ** requires
+        *** Spring `ApplicationContext` / WITHOUT
+            **** deploying your application or
+            **** connecting to other infrastructure
+    ** Spring Framework has a dedicated test module
+    ** way to use
+        *** declare a dependency | `org.springframework:spring-test` or
+            **** see {url-spring-framework-docs}/testing.html[Spring Framework testing documentation]
+        *** use the `spring-boot-starter-test` starter
