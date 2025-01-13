@@ -1,14 +1,13 @@
 [[howto.data-access]]
 = Data Access
 
-Spring Boot includes a number of starters for working with data sources.
-This section answers questions related to doing so.
-
-
+* goal
+    ** Spring Boot starterS -- for working with -- data sources
 
 [[howto.data-access.configure-custom-datasource]]
 == Configure a Custom DataSource
 
+* TODO:
 To configure your own `DataSource`, define a `@Bean` of that type in your configuration.
 Spring Boot reuses your `DataSource` anywhere one is required, including database initialization.
 If you need to externalize some settings, you can bind your `DataSource` to the environment (see xref:reference:features/external-config.adoc#features.external-config.typesafe-configuration-properties.third-party-configuration[]).
