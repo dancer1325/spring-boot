@@ -15,39 +15,35 @@
 [[getting-started.installing.java]]
 == Installation Instructions for the Java Developer
 
-* == Spring Boot == any standard Java library
-    ** 👁️NOT special integration tool is required 👁
-        *** any IDE or text editor can be used
-    ** Run and debug a Spring Boot application == any other Java program
+* Spring Boot's installation instructions == any standard Java library's installation instructions
+    ** ❌️NOT require special integration tool ❌
+        *** == ANY IDE or text editor -- can be -- used
+    ** run & debug a Spring Boot application == run & debug ANY other Java program
 * steps
-    ** include the appropriate `+spring-boot-*.jar+` files on your classpath
+    ** include the appropriate `+spring-boot-*.jar+` files | your classpath
         *** ways
             **** copy Spring Boot jars
             **** use a build tool / supports dependency management ( _Example:_ Maven or Gradle)
-                ***** Recommended
+                ***** 👀recommended👀
 
 [[getting-started.installing.java.maven]]
 === Maven Installation
 
-Spring Boot is compatible with Apache Maven 3.6.3 or later.
-If you do not already have Maven installed, you can follow the instructions at https://maven.apache.org.
-
-TIP: On many operating systems, Maven can be installed with a package manager.
-If you use OSX Homebrew, try `brew install maven`.
-Ubuntu users can run `sudo apt-get install maven`.
-Windows users with https://chocolatey.org/[Chocolatey] can run `choco install maven` from an elevated (administrator) prompt.
-
-Spring Boot dependencies use the `org.springframework.boot` group id.
-Typically, your Maven POM file inherits from the `spring-boot-starter-parent` project and declares dependencies to one or more xref:reference:using/build-systems.adoc#using.build-systems.starters[starters].
-Spring Boot also provides an optional xref:maven-plugin:index.adoc[Maven plugin] to create executable jars.
-
-More details on getting started with Spring Boot and Maven can be found in the xref:maven-plugin:getting-started.adoc[] section of the Maven plugin's reference guide.
-
+* Apache Maven 3.6.3+
+* `org.springframework.boot`
+    ** Spring Boot dependencies' group id
+* how to use?
+    ** inherits -- from -- `spring-boot-starter-parent` project
+    ** use xref:reference:using/build-systems.adoc#using.build-systems.starters[starters]
+* xref:maven-plugin:index.adoc[Spring Boot Maven plugin]
+    ** -- create -- executable jars
+* see xref:maven-plugin:getting-started.adoc[]
 
 
 [[getting-started.installing.java.gradle]]
 === Gradle Installation
 
+* TODO:
 Spring Boot is compatible with Gradle 7.x (7.6.4 or later) or 8.x (8.3 or later).
 If you do not already have Gradle installed, you can follow the instructions at https://gradle.org.
 
